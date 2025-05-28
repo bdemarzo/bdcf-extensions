@@ -1,0 +1,17 @@
+name: CI - Build and Test
+
+on:
+  push:
+    branches: [ main ]
+
+jobs:
+  build-and-test:
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '8.0.x'
+      - run: |
+          # dotnet build Bdcf.Extensions.sln --configuration Release
+          # dotnet test Tests/Bdcf.Extensions/Bdcf.Extensions.csproj --configuration Release
