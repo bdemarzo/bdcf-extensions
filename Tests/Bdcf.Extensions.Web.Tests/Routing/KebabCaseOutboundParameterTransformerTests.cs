@@ -6,10 +6,10 @@ public class KebabCaseOutboundParameterTransformerTests
 
 	[Theory]
 	[InlineData("TimeCard", "time-card")]
-	[InlineData("HTMLParser", "htmlparser")]              // no lowercase before uppercase
+	[InlineData("HTMLParser", "html-parser")]
 	[InlineData("MyAPIEndpoint", "my-api-endpoint")]
 	[InlineData("With/SlashValue", "with/slash-value")]
-	[InlineData("Already-Kebab", "already--kebab")]
+	[InlineData("Already-Kebab", "already-kebab")]
 	[InlineData("snake_case", "snake_case")]
 	[InlineData(null, null)]
 	[InlineData("", "")]
