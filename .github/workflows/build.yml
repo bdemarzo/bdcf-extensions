@@ -1,17 +1,45 @@
-name: CI - Build and Test
+name: Build and Test
 
 on:
   push:
     branches: [ main ]
+  pull_request:
+    branches: [ main ]
 
 jobs:
-  build-and-test:
+  build:
     runs-on: windows-latest
+
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-dotnet@v4
-        with:
-          dotnet-version: '8.0.x'
-      - run: |
-          # dotnet build Bdcf.Extensions.sln --configuration Release
-          # dotnet test Tests/Bdcf.Extensions/Bdcf.Extensions.csproj --configuration Release
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Setup .NET
+      uses: actions/setup-dotnet@v4
+      with:
+        dotnet-version: '8.x'
+
+    - name: Restore dependencies
+      run: dotnet restore Bdcf.Extensions.sln
+
+    - name: Build
+      run: dotnet build Bdcf.Extensions.sln --configuration Release --no-restore
+
+    - name: Test with coverage - Bdcf.Extensions.Tests
+      run: dotnet test Tests/Bdcf.Extensions.Tests/Bdcf.Extensions.Tests.csproj --configuration Release --no-build --collect:"XPlat Code Coverage"
+
+    - name: Test with coverage - Bdcf.Extensions.Web.Tests
+      run: dotnet test Tests/Bdcf.Extensions.Web.Tests/Bdcf.Extensions.Web.Tests.csproj --configuration Release --no-build --collect:"XPlat Code Coverage"
+
+    - name: Install ReportGenerator
+      run: dotnet tool install --global dotnet-reportgenerator-globaltool
+
+    - name: Generate coverage report
+      run: |
+        reportgenerator -reports:**/coverage.cobertura.xml -targetdir:coveragereport -reporttypes:Html
+
+    - name: Upload coverage report artifact
+      uses: actions/upload-artifact@v4
+      with:
+        name: coverage-report
+        path: coveragereport
