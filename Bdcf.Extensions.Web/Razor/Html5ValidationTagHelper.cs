@@ -10,14 +10,12 @@ public class Html5ValidationTagHelper : TagHelper
 	[HtmlAttributeName("asp-for")]
 	public required ModelExpression For { get; set; }
 
-	private readonly Html5ValidationTagHelperLogic _logic = new();
-
 	public override void Process(TagHelperContext context, TagHelperOutput output)
 	{
 		base.Process(context, output);
 
 		var attributes = new Dictionary<string, string>();
-		_logic.ApplyValidationAttributes(For.Metadata, For.Model, attributes);
+		Html5ValidationTagHelperLogic.ApplyValidationAttributes(For.Metadata, For.Model, attributes);
 
 		foreach (var attr in attributes)
 		{

@@ -1,12 +1,12 @@
-﻿using Bdcf.Extensions.DataAnnotations;
+using Bdcf.Extensions.DataAnnotations;
 using Microsoft.AspNetCore.Mvc.ModelBinding;
 using System.ComponentModel.DataAnnotations;
 
 namespace Bdcf.Extensions.Web.Razor;
 
-public class Html5ValidationTagHelperLogic
+public static class Html5ValidationTagHelperLogic
 {
-	public void ApplyValidationAttributes(ModelMetadata metadata, object? model, IDictionary<string, string> attributes)
+	public static void ApplyValidationAttributes(ModelMetadata metadata, object? model, IDictionary<string, string> attributes)
 	{
 		ApplyRequired(metadata, attributes);
 		ApplyPattern(metadata, attributes);
@@ -14,7 +14,7 @@ public class Html5ValidationTagHelperLogic
 		ApplyTimeSpanAttributes(metadata, model, attributes);
 	}
 
-	private void ApplyRequired(ModelMetadata metadata, IDictionary<string, string> attributes)
+	private static void ApplyRequired(ModelMetadata metadata, IDictionary<string, string> attributes)
 	{
 		if (metadata.ValidatorMetadata.OfType<RequiredAttribute>().Any())
 		{
@@ -22,7 +22,7 @@ public class Html5ValidationTagHelperLogic
 		}
 	}
 
-	private void ApplyPattern(ModelMetadata metadata, IDictionary<string, string> attributes)
+	private static void ApplyPattern(ModelMetadata metadata, IDictionary<string, string> attributes)
 	{
 		var pattern = metadata.ValidatorMetadata.OfType<RegularExpressionAttribute>().SingleOrDefault();
 		if (pattern is not null)
@@ -31,7 +31,7 @@ public class Html5ValidationTagHelperLogic
 		}
 	}
 
-	private void ApplyNumberAttributes(ModelMetadata metadata, IDictionary<string, string> attributes)
+	private static void ApplyNumberAttributes(ModelMetadata metadata, IDictionary<string, string> attributes)
 	{
 		var dataType = metadata.ValidatorMetadata.OfType<DataTypeAttribute>().SingleOrDefault()?.DataType;
 
@@ -54,11 +54,14 @@ public class Html5ValidationTagHelperLogic
 		}
 	}
 
-	private void ApplyTimeSpanAttributes(ModelMetadata metadata, object? model, IDictionary<string, string> attributes)
+	private static void ApplyTimeSpanAttributes(ModelMetadata metadata, object? model, IDictionary<string, string> attributes)
 	{
 		if (metadata.ModelType == typeof(TimeSpan) || metadata.ModelType == typeof(TimeSpan?))
 		{
-			if (model is not TimeSpan timeSpan) return;
+			if (model is not TimeSpan timeSpan)
+			{
+				return;
+			}
 
 			var precisionAttribute = metadata.ValidatorMetadata.OfType<PrecisionAttribute>().FirstOrDefault();
 			attributes["type"] = "text";

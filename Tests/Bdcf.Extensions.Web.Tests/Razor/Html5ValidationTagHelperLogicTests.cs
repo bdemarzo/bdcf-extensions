@@ -7,14 +7,12 @@ namespace Bdcf.Extensions.Web.Razor.Tests;
 
 public class Html5ValidationTagHelperLogicTests
 {
-	private Html5ValidationTagHelperLogic _logic = new Html5ValidationTagHelperLogic();
-
-	private ModelMetadata CreateMetadata(Type type, params object[] validatorAttributes)
+	private static CustomModelMetadata CreateMetadata(Type type, params object[] validatorAttributes)
 	{
 		var identity = ModelMetadataIdentity.ForType(type);
 		var metadataProvider = new EmptyModelMetadataProvider();
 		var compositeProvider = new FakeCompositeMetadataDetailsProvider();
-		return new CustomModelMetadata(metadataProvider, compositeProvider, identity, type, validatorAttributes.ToList());
+		return new CustomModelMetadata(metadataProvider, compositeProvider, identity, type, [.. validatorAttributes]);
 	}
 
 	private class FakeCompositeMetadataDetailsProvider : ICompositeMetadataDetailsProvider
@@ -44,7 +42,7 @@ public class Html5ValidationTagHelperLogicTests
 	{
 		var metadata = CreateMetadata(typeof(string), new RequiredAttribute());
 		var attributes = new Dictionary<string, string>();
-		_logic.ApplyValidationAttributes(metadata, null, attributes);
+		Html5ValidationTagHelperLogic.ApplyValidationAttributes(metadata, null, attributes);
 
 		Assert.Equal("required", attributes["required"]);
 	}
@@ -54,7 +52,7 @@ public class Html5ValidationTagHelperLogicTests
 	{
 		var metadata = CreateMetadata(typeof(string), new RegularExpressionAttribute("^[a-z]+$"));
 		var attributes = new Dictionary<string, string>();
-		_logic.ApplyValidationAttributes(metadata, null, attributes);
+		Html5ValidationTagHelperLogic.ApplyValidationAttributes(metadata, null, attributes);
 
 		Assert.Equal("^[a-z]+$", attributes["pattern"]);
 	}
@@ -64,7 +62,7 @@ public class Html5ValidationTagHelperLogicTests
 	{
 		var metadata = CreateMetadata(typeof(decimal), new DataTypeAttribute(DataType.Currency), new PrecisionAttribute(3));
 		var attributes = new Dictionary<string, string>();
-		_logic.ApplyValidationAttributes(metadata, null, attributes);
+		Html5ValidationTagHelperLogic.ApplyValidationAttributes(metadata, null, attributes);
 
 		Assert.Equal("number", attributes["type"]);
 		Assert.Equal("0.001", attributes["step"]);
@@ -77,7 +75,7 @@ public class Html5ValidationTagHelperLogicTests
 	{
 		var metadata = CreateMetadata(typeof(decimal), new DataTypeAttribute(DataType.Currency), new RangeAttribute(0, 100));
 		var attributes = new Dictionary<string, string>();
-		_logic.ApplyValidationAttributes(metadata, null, attributes);
+		Html5ValidationTagHelperLogic.ApplyValidationAttributes(metadata, null, attributes);
 
 		Assert.Equal("number", attributes["type"]);
 		Assert.Equal("0", attributes["min"]);
@@ -90,7 +88,7 @@ public class Html5ValidationTagHelperLogicTests
 	{
 		var metadata = CreateMetadata(typeof(decimal), new DataTypeAttribute(DataType.Currency), new RangeAttribute(0.5, 99.5));
 		var attributes = new Dictionary<string, string>();
-		_logic.ApplyValidationAttributes(metadata, null, attributes);
+		Html5ValidationTagHelperLogic.ApplyValidationAttributes(metadata, null, attributes);
 
 		Assert.Equal("number", attributes["type"]);
 		Assert.Equal("0.5", attributes["min"]);
@@ -106,7 +104,7 @@ public class Html5ValidationTagHelperLogicTests
 	{
 		var metadata = CreateMetadata(typeof(decimal), new DataTypeAttribute(DataType.Currency), new PrecisionAttribute(decimalPlaces));
 		var attributes = new Dictionary<string, string>();
-		_logic.ApplyValidationAttributes(metadata, null, attributes);
+		Html5ValidationTagHelperLogic.ApplyValidationAttributes(metadata, null, attributes);
 
 		Assert.Equal("number", attributes["type"]);
 		if (expectedStep is not null)
@@ -122,7 +120,7 @@ public class Html5ValidationTagHelperLogicTests
 		var precision = new PrecisionAttribute(TimeInterval.Minutes);
 		var metadata = CreateMetadata(typeof(TimeSpan), precision);
 		var attributes = new Dictionary<string, string>();
-		_logic.ApplyValidationAttributes(metadata, time, attributes);
+		Html5ValidationTagHelperLogic.ApplyValidationAttributes(metadata, time, attributes);
 
 		Assert.Equal("text", attributes["type"]);
 		Assert.Equal("h:mm", attributes["placeholder"]);

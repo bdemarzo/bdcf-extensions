@@ -12,7 +12,6 @@ public class NoIndexAttributeTests
 	[Fact]
 	public void OnResultExecuting_AppendsXRobotsTagHeader()
 	{
-		// Arrange
 		var headers = new HeaderDictionary();
 		var mockResponse = new Mock<HttpResponse>();
 		mockResponse.Setup(r => r.Headers).Returns(headers);
@@ -29,17 +28,15 @@ public class NoIndexAttributeTests
 
 		var resultContext = new ResultExecutingContext(
 			actionContext,
-			new List<IFilterMetadata>(),
+			[],
 			new OkResult(),
-			controller: null
+			controller: null!
 		);
 
 		var filter = new NoIndexAttribute();
 
-		// Act
 		filter.OnResultExecuting(resultContext);
 
-		// Assert
 		Assert.True(headers.ContainsKey("X-Robots-Tag"));
 		Assert.Equal("noindex", headers["X-Robots-Tag"]);
 	}

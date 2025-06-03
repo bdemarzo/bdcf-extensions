@@ -1,0 +1,55 @@
+# .editorconfig for Bdcf.Extensions
+
+root = true
+
+[*.cs]
+charset = utf-8
+end_of_line = crlf
+insert_final_newline = true
+
+indent_style = tab
+indent_size = tab
+
+# C# code style rules
+csharp_style_prefer_primary_constructors = false:suggestion
+dotnet_sort_system_directives_first = true
+dotnet_style_qualification_for_field = false:warning
+dotnet_style_qualification_for_property = false:warning
+dotnet_style_qualification_for_method = false:warning
+dotnet_style_qualification_for_event = false:warning
+
+csharp_new_line_before_open_brace = all
+csharp_indent_case_contents = true
+csharp_indent_switch_labels = true
+csharp_preserve_single_line_blocks = false
+csharp_preserve_single_line_statements = false
+csharp_prefer_braces = false:warning
+
+# Naming conventions
+
+# Private fields: camelCase
+dotnet_naming_rule.private_fields_should_be_camel_case.severity = suggestion
+dotnet_naming_rule.private_fields_should_be_camel_case.symbols = private_fields
+dotnet_naming_rule.private_fields_should_be_camel_case.style = camel_case
+
+# Private classes: PascalCase
+
+dotnet_naming_rule.private_classes_should_be_pascal_case.severity = suggestion
+dotnet_naming_rule.private_classes_should_be_pascal_case.symbols = private_classes
+dotnet_naming_rule.private_classes_should_be_pascal_case.style = pascal_case
+
+# Symbol group
+dotnet_naming_symbols.private_fields.applicable_accessibilities = private
+dotnet_naming_symbols.private_fields.applicable_kinds = field
+dotnet_naming_symbols.private_fields.required_modifiers = none
+
+# Symbol group for private classes
+dotnet_naming_symbols.private_classes.applicable_accessibilities = private
+dotnet_naming_symbols.private_classes.applicable_kinds = class
+dotnet_naming_symbols.private_classes.required_modifiers = none
+
+# Naming style
+dotnet_naming_style.camel_case.capitalization = camel_case
+dotnet_naming_style.camel_case.required_prefix = _
+
+dotnet_naming_style.pascal_case.capitalization = pascal_case
