@@ -1,13 +1,12 @@
-name: Build and Test
+name: Publish NuGet Package
 
 on:
   push:
-    branches: [ main ]
-  pull_request:
-    branches: [ main ]
+    tags:
+      - 'v*'
 
 jobs:
-  build:
+  publish:
     runs-on: windows-latest
 
     steps:
@@ -27,3 +26,11 @@ jobs:
 
     - name: Run Tests
       run: dotnet test Bdcf.Extensions.sln --configuration Release --no-build
+
+    - name: Pack
+      run: dotnet pack Bdcf.Extensions.sln --configuration Release --no-build --output ./nupkg
+
+    - name: Publish to GitHub Packages
+      run: dotnet nuget push ./nupkg/*.nupkg --source "github" --api-key ${{ secrets.GITHUB_TOKEN }}
+      env:
+        NUGET_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
