@@ -50,7 +50,18 @@ jobs:
         run: dotnet test Bdcf.Extensions.sln --configuration Release --no-build
 
       - name: Pack
-        run: dotnet pack Bdcf.Extensions.sln --configuration Release --no-build --output ./nupkg /p:Version=${{ steps.clean_version.outputs.clean_version }}
+        run: dotnet pack Bdcf.Extensions.sln --configuration Release --no-build --output nupkg /p:Version=${{ steps.clean_version.outputs.clean_version }}
+
+      - name: Debug pack output
+        shell: pwsh
+        run: |
+          Write-Host "Current directory contents:"
+          Get-ChildItem -Recurse
+          Write-Host "Check that .nupkg files exist in ./nupkg:"
+          if (-not (Test-Path ./nupkg/*.nupkg)) {
+            Write-Error ".nupkg file not found in ./nupkg after packing"
+            exit 1
+          }
 
       - name: Publish to GitHub Packages
         run: dotnet nuget push nupkg/*.nupkg --source "https://nuget.pkg.github.com/bdemarzo/index.json" --api-key ${{ secrets.NUGET_TOKEN }}
