@@ -50,7 +50,7 @@ jobs:
         run: dotnet test Bdcf.Extensions.sln --configuration Release --no-build
 
       - name: Pack
-        run: dotnet pack Bdcf.Extensions.sln --configuration Release --no-build --output nupkg /p:Version=${{ steps.clean_version.outputs.clean_version }}
+        run: dotnet pack Bdcf.Extensions.sln --configuration Release --no-build --output ./nupkg /p:Version=${{ steps.clean_version.outputs.clean_version }}
 
       - name: Debug pack output
         shell: pwsh
@@ -64,17 +64,8 @@ jobs:
           }
 
       - name: Publish to GitHub Packages
-        shell: pwsh
-        run: |
-          $nupkgs = Get-ChildItem -Path $env:GITHUB_WORKSPACE/nupkg -Filter *.nupkg
-          if (-not $nupkgs) {
-            Write-Error "No .nupkg files found in ./nupkg"
-            exit 1
-          }
-
-          foreach ($pkg in $nupkgs) {
-            dotnet nuget push $pkg.FullName --source "https://nuget.pkg.github.com/bdemarzo/index.json" --api-key "${{ secrets.NUGET_TOKEN }}"
-          }
+        shell: cmd
+        run: dotnet nuget push nupkg\*.nupkg --source "https://nuget.pkg.github.com/bdemarzo/index.json" --api-key ${{ secrets.NUGET_TOKEN }}
 
       - name: Create GitHub Release
         uses: softprops/action-gh-release@v2
