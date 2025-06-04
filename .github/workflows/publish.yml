@@ -30,8 +30,9 @@ jobs:
 
       - name: Strip 'v' from tag
         id: clean_version
-        run: echo "clean_version=${{ steps.get_version.outputs.version#v }}" >> $GITHUB_OUTPUT
-
+        run: echo "clean_version=${GITHUB_REF##*/}" | sed 's/^v//' >> $GITHUB_OUTPUT
+        shell: bash
+        
       - name: Setup .NET
         uses: actions/setup-dotnet@v4
         with:
