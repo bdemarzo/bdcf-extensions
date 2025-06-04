@@ -53,10 +53,11 @@ jobs:
         run: dotnet pack Bdcf.Extensions.sln --configuration Release --no-build --output ./nupkg /p:Version=${{ steps.clean_version.outputs.clean_version }}
 
       - name: Verify package was created
+        shell: pwsh
         run: |
-          echo "Packages in ./nupkg:"
-          dir ./nupkg
-          if not exist .\nupkg\*.nupkg exit 1
+          Write-Host "Packages in ./nupkg:"
+          Get-ChildItem ./nupkg
+          if (-not (Get-ChildItem ./nupkg/*.nupkg)) { exit 1 }
 
       - name: Publish to GitHub Packages
         run: dotnet nuget push ./nupkg/*.nupkg --source "https://nuget.pkg.github.com/bdemarzo/index.json" --api-key ${{ secrets.NUGET_TOKEN }}
