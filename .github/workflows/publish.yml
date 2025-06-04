@@ -64,7 +64,17 @@ jobs:
           }
 
       - name: Publish to GitHub Packages
-        run: dotnet nuget push nupkg/*.nupkg --source "https://nuget.pkg.github.com/bdemarzo/index.json" --api-key ${{ secrets.NUGET_TOKEN }}
+        shell: pwsh
+        run: |
+          $nupkgs = Get-ChildItem -Path $env:GITHUB_WORKSPACE/nupkg -Filter *.nupkg
+          if (-not $nupkgs) {
+            Write-Error "No .nupkg files found in ./nupkg"
+            exit 1
+          }
+
+          foreach ($pkg in $nupkgs) {
+            dotnet nuget push $pkg.FullName --source "https://nuget.pkg.github.com/bdemarzo/index.json" --api-key "${{ secrets.NUGET_TOKEN }}"
+          }
 
       - name: Create GitHub Release
         uses: softprops/action-gh-release@v2
