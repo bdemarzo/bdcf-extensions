@@ -10,27 +10,56 @@ jobs:
     runs-on: windows-latest
 
     steps:
-    - name: Checkout code
-      uses: actions/checkout@v4
+      - name: Checkout code
+        uses: actions/checkout@v4
 
-    - name: Setup .NET
-      uses: actions/setup-dotnet@v4
-      with:
-        dotnet-version: '8.x'
+      - name: Validate semantic version tag
+        run: |
+          echo "Checking tag: $GITHUB_REF"
+          if [[ "$GITHUB_REF" =~ refs/tags/v([0-9]+)\.([0-9]+)\.([0-9]+)(-.+)?$ ]]; then
+            echo "Valid semver tag detected"
+          else
+            echo "Invalid version tag. Use vMAJOR.MINOR.PATCH format."
+            exit 1
+          fi
+        shell: bash
 
-    - name: Restore dependencies
-      run: dotnet restore Bdcf.Extensions.sln
+      - name: Extract version from tag
+        id: get_version
+        run: echo "version=${GITHUB_REF##*/}" >> $GITHUB_OUTPUT
 
-    - name: Build
-      run: dotnet build Bdcf.Extensions.sln --configuration Release --no-restore
+      - name: Strip 'v' from tag
+        id: clean_version
+        run: echo "clean_version=${{ steps.get_version.outputs.version#v }}" >> $GITHUB_OUTPUT
 
-    - name: Run Tests
-      run: dotnet test Bdcf.Extensions.sln --configuration Release --no-build
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '8.x'
 
-    - name: Pack
-      run: dotnet pack Bdcf.Extensions.sln --configuration Release --no-build --output ./nupkg
+      - name: Restore dependencies
+        run: dotnet restore Bdcf.Extensions.sln
 
-    - name: Publish to GitHub Packages
-      run: dotnet nuget push ./nupkg/*.nupkg --source "https://nuget.pkg.github.com/bdemarzo/index.json" --api-key ${{ secrets.NUGET_TOKEN }}
-      env:
-        NUGET_AUTH_TOKEN: ${{ secrets.NUGET_TOKEN }}
+      - name: Build
+        run: dotnet build Bdcf.Extensions.sln --configuration Release --no-restore /p:GeneratePackageOnBuild=true
+
+      - name: Run Tests
+        run: dotnet test Bdcf.Extensions.sln --configuration Release --no-build
+
+      - name: Pack
+        run: dotnet pack Bdcf.Extensions.sln --configuration Release --no-build --output ./nupkg /p:Version=${{ steps.clean_version.outputs.clean_version }}
+
+      - name: Verify package was created
+        run: |
+          echo "Packages in ./nupkg:"
+          dir ./nupkg
+          if not exist .\nupkg\*.nupkg exit 1
+
+      - name: Publish to GitHub Packages
+        run: dotnet nuget push ./nupkg/*.nupkg --source "https://nuget.pkg.github.com/bdemarzo/index.json" --api-key ${{ secrets.NUGET_TOKEN }}
+
+      - name: Create GitHub Release
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: ${{ steps.get_version.outputs.version }}
+          generate_release_notes: true
