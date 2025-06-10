@@ -1,66 +1,49 @@
-﻿using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations;
 
 namespace Bdcf.Extensions.DataAnnotations;
 
-[AttributeUsage(AttributeTargets.Property, Inherited = false, AllowMultiple = false)]
+[AttributeUsage(AttributeTargets.Property | AttributeTargets.Field, Inherited = false, AllowMultiple = false)]
 public class PrecisionAttribute : ValidationAttribute
 {
-	public int DecimalPlaces { get; } = 0;
-	public TimeInterval TimeInterval { get; } = TimeInterval.Seconds;
+	public int DecimalPlaces { get; set; } = -1;
 
-	public PrecisionAttribute(int decimalPlaces)
-	{
-		DecimalPlaces = decimalPlaces;
-	}
-
-	public PrecisionAttribute(TimeInterval timeInterval)
-	{
-		TimeInterval = timeInterval;
-	}
+	public TimeSpanPrecision TimeSpanPrecision { get; set; } = TimeSpanPrecision.None;
 
 	protected override ValidationResult? IsValid(object? value, ValidationContext validationContext)
 	{
 		if (value is null)
-		{
 			return ValidationResult.Success;
-		}
 
-		if (value is decimal decimalValue)
+		var property = validationContext.ObjectType.GetProperty(validationContext.MemberName!);
+		if (property is null)
+			return new ValidationResult($"Property '{validationContext.MemberName}' not found on type '{validationContext.ObjectType.Name}'.");
+
+		if (value is decimal decimalValue && DecimalPlaces >= 0)
 		{
-			var multiplier = (decimal)Math.Pow(10, DecimalPlaces);
-			var truncatedValue = Math.Truncate(decimalValue * multiplier) / multiplier;
-
-			// Use reflection to set the truncated value back to the property
-			var property = validationContext.ObjectType.GetProperty(validationContext.MemberName!);
-			if (property is not null && property.CanWrite)
-			{
-				property.SetValue(validationContext.ObjectInstance, truncatedValue);
-			}
+			var truncated = Math.Truncate(decimalValue * (decimal)Math.Pow(10, DecimalPlaces)) / (decimal)Math.Pow(10, DecimalPlaces);
+			property.SetValue(validationContext.ObjectInstance, truncated);
 
 			return ValidationResult.Success;
 		}
 		else if (value is TimeSpan timeSpan)
 		{
-			var adjustedTimeSpan = timeSpan;
+			if (TimeSpanPrecision == TimeSpanPrecision.None)
+				return ValidationResult.Success; // No truncation needed
 
-			switch (TimeInterval)
+			TimeSpan truncated = timeSpan;
+			switch (TimeSpanPrecision)
 			{
-				case TimeInterval.Hours:
-					adjustedTimeSpan = new TimeSpan(timeSpan.Hours, 0, 0);
+				case TimeSpanPrecision.Hours:
+					truncated = new TimeSpan(timeSpan.Hours, 0, 0);
 					break;
-				case TimeInterval.Minutes:
-					adjustedTimeSpan = new TimeSpan(timeSpan.Hours, timeSpan.Minutes, 0);
+				case TimeSpanPrecision.Minutes:
+					truncated = new TimeSpan(timeSpan.Hours, timeSpan.Minutes, 0);
 					break;
-				case TimeInterval.Seconds:
-					// No need to adjust for seconds precision
+				case TimeSpanPrecision.Seconds:
+					truncated = new TimeSpan(timeSpan.Hours, timeSpan.Minutes, timeSpan.Seconds);
 					break;
 			}
-
-			var property = validationContext.ObjectType.GetProperty(validationContext.MemberName!);
-			if (property is not null && property.CanWrite)
-			{
-				property.SetValue(validationContext.ObjectInstance, adjustedTimeSpan);
-			}
+			property.SetValue(validationContext.ObjectInstance, truncated);
 
 			return ValidationResult.Success;
 		}

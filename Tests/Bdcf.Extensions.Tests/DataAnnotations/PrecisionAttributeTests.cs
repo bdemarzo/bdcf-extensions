@@ -1,4 +1,4 @@
-﻿using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations;
 
 namespace Bdcf.Extensions.DataAnnotations.Tests;
 
@@ -6,13 +6,13 @@ public class PrecisionAttributeTests
 {
 	private class DecimalTestModel
 	{
-		[Precision(2)]
+		[Precision(DecimalPlaces = 2)]
 		public decimal Value { get; set; }
 	}
 
 	private class TimeSpanTestModel
 	{
-		[Precision(TimeInterval.Minutes)]
+		[Precision(TimeSpanPrecision = TimeSpanPrecision.Minutes)]
 		public TimeSpan Value { get; set; }
 	}
 
@@ -28,7 +28,7 @@ public class PrecisionAttributeTests
 		decimal? inputValue = input as decimal?;
 		decimal? expectedValue = expected as decimal?;
 
-		var attribute = new PrecisionAttribute(decimalPlaces);
+		var attribute = new PrecisionAttribute { DecimalPlaces = decimalPlaces };
 		var model = new DecimalTestModel { Value = inputValue ?? 0m };
 		var context = new ValidationContext(model) { MemberName = nameof(model.Value) };
 
@@ -39,20 +39,20 @@ public class PrecisionAttributeTests
 	}
 
     [Theory]
-    [InlineData(1, 30, 45, TimeInterval.Hours, 1, 0, 0)]
-    [InlineData(2, 45, 59, TimeInterval.Minutes, 2, 45, 0)]
-    [InlineData(3, 15, 20, TimeInterval.Seconds, 3, 15, 20)]
-    [InlineData(0, 0, 0, TimeInterval.Minutes, 0, 0, 0)]
-    [InlineData(null, null, null, TimeInterval.Minutes, null, null, null)]
+	[InlineData(1, 30, 45, TimeSpanPrecision.None, 1, 30, 45)]
+	[InlineData(1, 30, 45, TimeSpanPrecision.Hours, 1, 0, 0)]
+    [InlineData(2, 45, 59, TimeSpanPrecision.Minutes, 2, 45, 0)]
+    [InlineData(3, 15, 20, TimeSpanPrecision.Seconds, 3, 15, 20)]
+    [InlineData(0, 0, 0, TimeSpanPrecision.Minutes, 0, 0, 0)]
 	public void ValidationShouldAdjustTimeSpanPrecision(
         int? hours, int? minutes, int? seconds,
-        TimeInterval precision,
+        TimeSpanPrecision precision,
         int? expectedHours, int? expectedMinutes, int? expectedSeconds)
     {
         TimeSpan? input = hours.HasValue ? new TimeSpan(hours.Value, minutes!.Value, seconds!.Value) : (TimeSpan?)null;
         var expected = expectedHours.HasValue ? new TimeSpan(expectedHours.Value, expectedMinutes!.Value, expectedSeconds!.Value) : (TimeSpan?)null;
 
-        var attribute = new PrecisionAttribute(precision);
+        var attribute = new PrecisionAttribute { TimeSpanPrecision = precision};
         var model = new TimeSpanTestModel { Value = input ?? TimeSpan.Zero };
 		var context = new ValidationContext(model) { MemberName = nameof(model.Value) };
 
@@ -60,6 +60,6 @@ public class PrecisionAttributeTests
 
         // Assert
         Assert.Equal(ValidationResult.Success, result);
-        Assert.Equal(expected ?? TimeSpan.Zero, model.Value);
+        Assert.Equal(expected, model.Value);
     }
 }

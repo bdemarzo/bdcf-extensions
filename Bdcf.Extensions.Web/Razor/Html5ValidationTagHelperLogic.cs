@@ -68,17 +68,17 @@ public static class Html5ValidationTagHelperLogic
 
 			if (precisionAttribute is not null)
 			{
-				switch (precisionAttribute.TimeInterval)
+				switch (precisionAttribute.TimeSpanPrecision)
 				{
-					case TimeInterval.Seconds:
+					case TimeSpanPrecision.Seconds:
 						attributes["placeholder"] = "h:mm:ss";
 						attributes["value"] = string.Format("{0}:{1:D2}:{2:D2}", (int)timeSpan.TotalHours, timeSpan.Minutes, timeSpan.Seconds);
 						break;
-					case TimeInterval.Minutes:
+					case TimeSpanPrecision.Minutes:
 						attributes["placeholder"] = "h:mm";
 						attributes["value"] = string.Format("{0}:{1:D2}", (int)timeSpan.TotalHours, timeSpan.Minutes);
 						break;
-					case TimeInterval.Hours:
+					case TimeSpanPrecision.Hours:
 						attributes["placeholder"] = "h";
 						attributes["value"] = ((int)timeSpan.TotalHours).ToString();
 						break;

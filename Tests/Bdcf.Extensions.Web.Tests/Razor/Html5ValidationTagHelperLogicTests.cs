@@ -1,4 +1,4 @@
-﻿using Bdcf.Extensions.DataAnnotations;
+using Bdcf.Extensions.DataAnnotations;
 using Microsoft.AspNetCore.Mvc.ModelBinding;
 using Microsoft.AspNetCore.Mvc.ModelBinding.Metadata;
 using System.ComponentModel.DataAnnotations;
@@ -17,9 +17,15 @@ public class Html5ValidationTagHelperLogicTests
 
 	private class FakeCompositeMetadataDetailsProvider : ICompositeMetadataDetailsProvider
 	{
-		public void CreateBindingMetadata(BindingMetadataProviderContext context) { }
-		public void CreateDisplayMetadata(DisplayMetadataProviderContext context) { }
-		public void CreateValidationMetadata(ValidationMetadataProviderContext context) { }
+		public void CreateBindingMetadata(BindingMetadataProviderContext context)
+		{
+		}
+		public void CreateDisplayMetadata(DisplayMetadataProviderContext context)
+		{
+		}
+		public void CreateValidationMetadata(ValidationMetadataProviderContext context)
+		{
+		}
 	}
 
 	private class CustomModelMetadata : DefaultModelMetadata
@@ -34,7 +40,10 @@ public class Html5ValidationTagHelperLogicTests
 		}
 
 		public override IReadOnlyList<object> ValidatorMetadata => _validatorMetadata;
-		public new Type ModelType { get; }
+		public new Type ModelType
+		{
+			get;
+		}
 	}
 
 	[Fact]
@@ -60,7 +69,7 @@ public class Html5ValidationTagHelperLogicTests
 	[Fact]
 	public void AddsDecimalTypeWithPrecision()
 	{
-		var metadata = CreateMetadata(typeof(decimal), new DataTypeAttribute(DataType.Currency), new PrecisionAttribute(3));
+		var metadata = CreateMetadata(typeof(decimal), new DataTypeAttribute(DataType.Currency), new PrecisionAttribute { DecimalPlaces = 3 });
 		var attributes = new Dictionary<string, string>();
 		Html5ValidationTagHelperLogic.ApplyValidationAttributes(metadata, null, attributes);
 
@@ -102,7 +111,7 @@ public class Html5ValidationTagHelperLogicTests
 	[InlineData(3, "0.001")]
 	public void AddsPrecisionSteps(int decimalPlaces, string? expectedStep)
 	{
-		var metadata = CreateMetadata(typeof(decimal), new DataTypeAttribute(DataType.Currency), new PrecisionAttribute(decimalPlaces));
+		var metadata = CreateMetadata(typeof(decimal), new DataTypeAttribute(DataType.Currency), new PrecisionAttribute { DecimalPlaces = decimalPlaces });
 		var attributes = new Dictionary<string, string>();
 		Html5ValidationTagHelperLogic.ApplyValidationAttributes(metadata, null, attributes);
 
@@ -117,7 +126,7 @@ public class Html5ValidationTagHelperLogicTests
 	public void AddsTimeSpanAttributes_Minutes()
 	{
 		var time = new TimeSpan(2, 30, 0);
-		var precision = new PrecisionAttribute(TimeInterval.Minutes);
+		var precision = new PrecisionAttribute { TimeSpanPrecision = TimeSpanPrecision.Minutes };
 		var metadata = CreateMetadata(typeof(TimeSpan), precision);
 		var attributes = new Dictionary<string, string>();
 		Html5ValidationTagHelperLogic.ApplyValidationAttributes(metadata, time, attributes);
