@@ -30,7 +30,10 @@ public static class MvcBuilderExtensions
 	/// <returns>The <see cref="IMvcBuilder"/> instance, allowing for further configuration.</returns>
 	public static IMvcBuilder AddTimeSpanModelBinder(this IMvcBuilder builder)
 	{
-		builder.Services.AddSingleton<IModelBinderProvider, TimeSpanModelBinderProvider>();
+		builder.Services.Configure<MvcOptions>(options =>
+		{
+			options.ModelBinderProviders.Add(new TimeSpanModelBinderProvider());
+		});
 		return builder;
 	}
 }
