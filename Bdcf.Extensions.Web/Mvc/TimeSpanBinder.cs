@@ -4,6 +4,13 @@ namespace Bdcf.Extensions.Web;
 
 public class TimeSpanModelBinder : IModelBinder
 {
+	/// <summary>
+	/// Attempts to bind a model of type <see cref="TimeSpan"/> from the provided input value.
+	/// </summary>
+	/// <param name="bindingContext">The <see cref="ModelBindingContext"/> containing the model name, value provider, and other context information
+	/// required for model binding. This parameter cannot be <see langword="null"/>.</param>
+	/// <returns>A <see cref="Task"/> that represents the asynchronous operation. The task result contains the binding outcome,
+	/// which may be a successfully bound <see cref="TimeSpan"/> instance or an error added to the model state.</returns>
 	public Task BindModelAsync(ModelBindingContext bindingContext)
 	{
 		var valueProviderResult = bindingContext.ValueProvider.GetValue(bindingContext.ModelName);

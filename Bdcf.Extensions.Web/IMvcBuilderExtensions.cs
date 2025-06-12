@@ -1,6 +1,7 @@
-﻿using Bdcf.Extensions.Web.Routing;
+using Bdcf.Extensions.Web.Routing;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.ApplicationModels;
+using Microsoft.AspNetCore.Mvc.ModelBinding;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace Bdcf.Extensions.Web;
@@ -19,6 +20,17 @@ public static class MvcBuilderExtensions
 			options.Conventions.Add(new RouteTokenTransformerConvention(new KebabCaseOutboundParameterTransformer()));
 		});
 
+		return builder;
+	}
+
+	/// <summary>
+	/// Adds a custom model binder for <see cref="TimeSpan"/> types to the MVC framework.
+	/// </summary>
+	/// <param name="builder">The <see cref="IMvcBuilder"/> used to configure MVC services.</param>
+	/// <returns>The <see cref="IMvcBuilder"/> instance, allowing for further configuration.</returns>
+	public static IMvcBuilder AddTimeSpanModelBinder(this IMvcBuilder builder)
+	{
+		builder.Services.AddSingleton<IModelBinderProvider, TimeSpanModelBinderProvider>();
 		return builder;
 	}
 }

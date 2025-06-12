@@ -57,11 +57,11 @@ public class DacPacService : IDacPacService
 		};
 		DacDeployOptions deployOptions = new()
 		{
-			BlockOnPossibleDataLoss = false,
-			GenerateSmartDefaults = true,
-			LongRunningCommandTimeout = 60,
-			DropObjectsNotInSource = true,
-			VerifyDeployment = true
+			BlockOnPossibleDataLoss = _options.BlockOnPossibleDataLoss,
+			GenerateSmartDefaults = _options.GenerateSmartDefaults,
+			LongRunningCommandTimeout = _options.LongRunningCommandTimeout,
+			DropObjectsNotInSource = _options.DropObjectsNotInSource,
+			VerifyDeployment = _options.VerifyDeployment
 		};
 
 		using DacPackage dacPackage = DacPackage.Load(dacPacStream);

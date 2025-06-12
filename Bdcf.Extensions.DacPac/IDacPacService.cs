@@ -5,5 +5,9 @@ namespace Bdcf.Extensions.DacPac;
 /// </summary>
 public interface IDacPacService
 {
+	/// <summary>
+	/// Deploys a Data-tier Application Component Package (DACPAC) to the target database specified in the connection
+	/// string.
+	/// </summary>
 	void ApplyDacPac();
 }

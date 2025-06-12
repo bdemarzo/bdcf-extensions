@@ -1,4 +1,4 @@
-﻿using Microsoft.AspNetCore.Routing;
+using Microsoft.AspNetCore.Routing;
 using System.Text.RegularExpressions;
 
 namespace Bdcf.Extensions.Web.Routing;
