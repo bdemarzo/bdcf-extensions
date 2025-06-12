@@ -1,6 +1,6 @@
-﻿using Microsoft.AspNetCore.Mvc.ModelBinding;
+using Microsoft.AspNetCore.Mvc.ModelBinding;
 
-namespace Gigkeeping.Web;
+namespace Bdcf.Extensions.Web;
 
 public class TimeSpanModelBinderProvider : IModelBinderProvider
 {
