@@ -24,7 +24,7 @@ public static class MvcBuilderExtensions
 	}
 
 	/// <summary>
-	/// Adds a custom model binder for <see cref="TimeSpan"/> types to the MVC framework.
+	/// Adds a custom model binder for <see cref="TimeSpan"/> types to the MVC framework, at the front of the provider list.
 	/// </summary>
 	/// <param name="builder">The <see cref="IMvcBuilder"/> used to configure MVC services.</param>
 	/// <returns>The <see cref="IMvcBuilder"/> instance, allowing for further configuration.</returns>
@@ -32,7 +32,7 @@ public static class MvcBuilderExtensions
 	{
 		builder.Services.Configure<MvcOptions>(options =>
 		{
-			options.ModelBinderProviders.Add(new TimeSpanModelBinderProvider());
+			options.ModelBinderProviders.Insert(0, new TimeSpanModelBinderProvider());
 		});
 		return builder;
 	}

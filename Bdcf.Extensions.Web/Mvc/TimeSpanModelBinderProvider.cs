@@ -12,7 +12,7 @@ public class TimeSpanModelBinderProvider : IModelBinderProvider
 	/// the model type is not <see cref="TimeSpan?"/>.</returns>
 	public IModelBinder? GetBinder(ModelBinderProviderContext context)
 	{
-		if (context.Metadata.ModelType == typeof(TimeSpan?))
+		if (context.Metadata.ModelType == typeof(TimeSpan) || context.Metadata.ModelType == typeof(TimeSpan?))
 		{
 			return new TimeSpanModelBinder();
 		}
