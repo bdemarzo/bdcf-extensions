@@ -17,6 +17,8 @@ public class PrecisionAttribute : ValidationAttribute
 		var property = validationContext.ObjectType.GetProperty(validationContext.MemberName!);
 		if (property is null)
 			return new ValidationResult($"Property '{validationContext.MemberName}' not found on type '{validationContext.ObjectType.Name}'.");
+		if (property.CanWrite == false)
+			return new ValidationResult($"Property '{validationContext.MemberName}' can not use PrecisionAttribute as it does not have a setter.");
 
 		if (value is decimal decimalValue && DecimalPlaces >= 0)
 		{
