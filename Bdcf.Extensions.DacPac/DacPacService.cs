@@ -4,6 +4,7 @@ using Microsoft.SqlServer.Dac;
 using System.Data.Common;
 using System.Reflection;
 using System.Configuration;
+using Microsoft.Extensions.Configuration;
 
 namespace Bdcf.Extensions.DacPac;
 
@@ -14,6 +15,7 @@ public class DacPacService : IDacPacService
 {
 	private readonly DacPacOptions _options;
 	private readonly ILogger<DacPacService> _logger;
+	private readonly IConfiguration? _configuration;
 
 	/// <summary>
 	/// Initializes a new instance of the <see cref="DacPacService"/> class.
@@ -27,6 +29,18 @@ public class DacPacService : IDacPacService
 	}
 
 	/// <summary>
+	/// Initializes a new instance of the <see cref="DacPacService"/> class with access to application configuration.
+	/// </summary>
+	/// <param name="options">The configuration options for the DacPac service.</param>
+	/// <param name="logger">The logger instance used to log diagnostic and operational information.</param>
+	/// <param name="configuration">The application configuration used to resolve named connection strings from appsettings.</param>
+	public DacPacService(IOptions<DacPacOptions> options, ILogger<DacPacService> logger, IConfiguration configuration)
+		: this(options, logger)
+	{
+		_configuration = configuration;
+	}
+
+	/// <summary>
 	/// Deploys a Data-tier Application Component Package (DACPAC) to the target database specified in the connection
 	/// string.
 	/// </summary>
@@ -35,10 +49,24 @@ public class DacPacService : IDacPacService
 		var connectionString = _options.ConnectionString;
 		if (!string.IsNullOrWhiteSpace(_options.ConnectionStringName))
 		{
-			var namedConnectionString = ConfigurationManager.ConnectionStrings[_options.ConnectionStringName];
-			if (!string.IsNullOrWhiteSpace(namedConnectionString?.ConnectionString))
+			string? namedConnectionString = null;
+			if (_configuration is not null)
 			{
-				connectionString = namedConnectionString.ConnectionString;
+				namedConnectionString = _configuration.GetConnectionString(_options.ConnectionStringName);
+			}
+
+			if (string.IsNullOrWhiteSpace(namedConnectionString))
+			{
+				var named = ConfigurationManager.ConnectionStrings[_options.ConnectionStringName];
+				if (!string.IsNullOrWhiteSpace(named?.ConnectionString))
+				{
+					namedConnectionString = named.ConnectionString;
+				}
+			}
+
+			if (!string.IsNullOrWhiteSpace(namedConnectionString))
+			{
+				connectionString = namedConnectionString;
 			}
 		}
 		var databaseName = GetDatabaseNameFromConnectionString(connectionString);
