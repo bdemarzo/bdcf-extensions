@@ -7,8 +7,17 @@ public record DacPacOptions
 {
 	/// <summary>
 	/// Gets the connection string used to establish a connection to the database.
+	/// If <see cref="ConnectionStringName"/> is specified and found, it takes precedence over this value.
+	/// If the connection string name is not found or empty, this value will be used instead.
 	/// </summary>
-	public required string ConnectionString { get; init; }
+	public string ConnectionString { get; init; } = string.Empty;
+
+	/// <summary>
+	/// Gets the connection string name to use to establish a connection to the database.
+	/// If this is specified, it takes precedence over <see cref="ConnectionString"/>.
+	/// If the connection string is not found or empty, <see cref="ConnectionString"/> will be used instead.
+	/// </summary>
+	public string ConnectionStringName { get; init; } = string.Empty;
 
 	/// <summary>
 	/// Specifies the name of the assembly where the dacpac file is stored (as an embedded resource).

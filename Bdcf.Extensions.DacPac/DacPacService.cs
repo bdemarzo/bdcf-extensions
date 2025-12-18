@@ -3,6 +3,7 @@ using Microsoft.Extensions.Logging;
 using Microsoft.SqlServer.Dac;
 using System.Data.Common;
 using System.Reflection;
+using System.Configuration;
 
 namespace Bdcf.Extensions.DacPac;
 
@@ -32,6 +33,14 @@ public class DacPacService : IDacPacService
 	public void ApplyDacPac()
 	{
 		var connectionString = _options.ConnectionString;
+		if (!string.IsNullOrWhiteSpace(_options.ConnectionStringName))
+		{
+			var namedConnectionString = ConfigurationManager.ConnectionStrings[_options.ConnectionStringName];
+			if (!string.IsNullOrWhiteSpace(namedConnectionString?.ConnectionString))
+			{
+				connectionString = namedConnectionString.ConnectionString;
+			}
+		}
 		var databaseName = GetDatabaseNameFromConnectionString(connectionString);
 		if (string.IsNullOrWhiteSpace(databaseName))
 			throw new InvalidOperationException("Database name could not be extracted from the connection string.");
