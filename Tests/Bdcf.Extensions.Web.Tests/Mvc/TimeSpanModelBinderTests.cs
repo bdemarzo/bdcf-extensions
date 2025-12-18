@@ -75,7 +75,7 @@ public class TimeSpanModelBinderTests
 		// Assert
 		Assert.False(bindingContext.Result.IsModelSet);
 		Assert.True(bindingContext.ModelState.ContainsKey("test"));
-		var error = bindingContext.ModelState["test"].Errors[0].ErrorMessage;
+		var error = bindingContext.ModelState["test"]?.Errors[0].ErrorMessage;
 		Assert.Equal("Invalid time format", error);
 	}
 

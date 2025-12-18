@@ -1,6 +1,6 @@
 using Microsoft.AspNetCore.Mvc.ModelBinding;
 
-namespace Bdcf.Extensions.Web;
+namespace Bdcf.Extensions.Web.Mvc;
 
 public class TimeSpanModelBinderProvider : IModelBinderProvider
 {

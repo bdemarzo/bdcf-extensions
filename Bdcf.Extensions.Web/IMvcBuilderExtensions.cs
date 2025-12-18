@@ -1,7 +1,7 @@
+using Bdcf.Extensions.Web.Mvc;
 using Bdcf.Extensions.Web.Routing;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.ApplicationModels;
-using Microsoft.AspNetCore.Mvc.ModelBinding;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace Bdcf.Extensions.Web;
