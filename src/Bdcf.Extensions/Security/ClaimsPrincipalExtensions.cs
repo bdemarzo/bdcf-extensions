@@ -112,21 +112,18 @@ public static class ClaimsPrincipalExtensions
 			return (T)(object)value;
 		}
 
-		if (Nullable.GetUnderlyingType(targetType) is Type underlyingType)
-		{
-			object? convertedValue = Convert.ChangeType(value, underlyingType);
-			return (T?)convertedValue;
-		}
+		var conversionType = Nullable.GetUnderlyingType(targetType) ?? targetType;
 
 		try
 		{
-			return (T)Convert.ChangeType(value, typeof(T));
+			object? convertedValue = Convert.ChangeType(value, conversionType);
+			return (T?)convertedValue;
 		}
 		catch
 		{
 			if (required)
 			{
-				throw new SecurityException($"Required claim {claimType} could not be converted to {typeof(T).Name}.");
+				throw new SecurityException($"Required claim {claimType} could not be converted to {conversionType.Name}.");
 			}
 
 			return default;

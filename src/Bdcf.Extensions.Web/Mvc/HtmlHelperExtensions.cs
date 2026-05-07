@@ -31,7 +31,7 @@ public static class HtmlHelperExtensions
 	/// </summary>
 	/// <param name="htmlHelper">The HTML helper.</param>
 	/// <param name="obj">The object.</param>
-	/// <returns>True if the object is null, false otherwise.</returns>
+	/// <returns>True if the object is not null, false otherwise.</returns>
 	public static bool IfHasValue(this IHtmlHelper htmlHelper, object obj)
 	{
 		return obj is not null;

@@ -22,6 +22,11 @@ public class DacPacServiceTests
 		{
 			return DacPacService.GetDacDeployOptions(options);
 		}
+
+		public new static Stream GetDacPacStream(DacPacOptions options)
+		{
+			return DacPacService.GetDacPacStream(options);
+		}
 	}
 
 	[Fact]
@@ -82,6 +87,20 @@ public class DacPacServiceTests
 		Assert.Equal(options.LongRunningCommandTimeout, result.LongRunningCommandTimeout);
 		Assert.Equal(options.DropObjectsNotInSource, result.DropObjectsNotInSource);
 		Assert.Equal(options.VerifyDeployment, result.VerifyDeployment);
+	}
+
+	[Fact]
+	public void GetDacPacStream_WithoutResourceAssembly_ThrowsInvalidOperationException()
+	{
+		var options = new DacPacOptions
+		{
+			ConnectionString = string.Empty,
+			DacPacName = "missing.dacpac"
+		};
+
+		var exception = Assert.Throws<InvalidOperationException>(() => TestableDacPacService.GetDacPacStream(options));
+
+		Assert.Contains("DACPAC resource assembly must be configured", exception.Message);
 	}
 
 	[Fact]

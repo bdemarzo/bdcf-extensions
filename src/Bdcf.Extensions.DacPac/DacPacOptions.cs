@@ -4,6 +4,8 @@ namespace Bdcf.Extensions.DacPac;
 
 /// <summary>
 /// Represents configuration options for deploying a Data-tier Application Component (DAC) package.
+/// Configure one of <see cref="DacPacAssembly"/>, <see cref="DacPacResourceMarkerType"/>, or <see cref="AssemblyName"/>
+/// to identify the assembly that contains the embedded DACPAC resource.
 /// </summary>
 public record DacPacOptions
 {
@@ -23,7 +25,8 @@ public record DacPacOptions
 
 	/// <summary>
 	/// Specifies the name of the assembly where the dacpac file is stored (as an embedded resource).
-	/// This is useful for configuration-bound options.
+	/// Use this when binding options from configuration instead of setting <see cref="DacPacAssembly"/> or
+	/// <see cref="DacPacResourceMarkerType"/> in code.
 	/// </summary>
 	public string? AssemblyName { get; init; }
 

@@ -138,13 +138,19 @@ public class DacPacService : IDacPacService
 	/// <summary>
 	/// Retrieves a stream for an embedded DacPac resource from the specified assembly.
 	/// </summary>
-	/// <param name="assemblyName">The name of the assembly containing the embedded DacPac resource. If <see langword="null"/>, the entry assembly is used when available.</param>
+	/// <param name="assemblyName">The name of the assembly containing the embedded DacPac resource.</param>
 	/// <param name="dacPacName">The name of the embedded DacPac resource to retrieve. This must match the resource name exactly.</param>
 	/// <returns>A <see cref="Stream"/> representing the embedded DacPac resource.</returns>
+	/// <exception cref="InvalidOperationException">Thrown if the assembly name is not configured.</exception>
 	/// <exception cref="FileNotFoundException">Thrown if the specified DacPac resource cannot be found in the assembly.</exception>
 	protected static Stream GetDacPacStream(string? assemblyName, string dacPacName)
 	{
-		var assembly = assemblyName is null ? GetDefaultDacPacAssembly() : Assembly.Load(assemblyName);
+		if (string.IsNullOrWhiteSpace(assemblyName))
+		{
+			throw new InvalidOperationException("DACPAC resource assembly must be configured.");
+		}
+
+		var assembly = Assembly.Load(assemblyName);
 
 		return assembly.GetManifestResourceStream(dacPacName) ?? throw new FileNotFoundException($"Unable to load embedded DacPac {dacPacName}");
 	}
@@ -154,6 +160,7 @@ public class DacPacService : IDacPacService
 	/// </summary>
 	/// <param name="options">The options used to resolve the resource assembly and name.</param>
 	/// <returns>A <see cref="Stream"/> representing the embedded DacPac resource.</returns>
+	/// <exception cref="InvalidOperationException">Thrown if no resource assembly is configured.</exception>
 	/// <exception cref="FileNotFoundException">Thrown if the specified DacPac resource cannot be found in the assembly.</exception>
 	protected static Stream GetDacPacStream(DacPacOptions options)
 	{
@@ -180,12 +187,8 @@ public class DacPacService : IDacPacService
 			return Assembly.Load(options.AssemblyName);
 		}
 
-		return GetDefaultDacPacAssembly();
-	}
-
-	private static Assembly GetDefaultDacPacAssembly()
-	{
-		return Assembly.GetEntryAssembly() ?? Assembly.GetCallingAssembly();
+		throw new InvalidOperationException(
+			"DACPAC resource assembly must be configured using DacPacAssembly, DacPacResourceMarkerType, or AssemblyName.");
 	}
 
 	/// <summary>

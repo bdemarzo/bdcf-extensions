@@ -74,9 +74,13 @@ jobs:
           dotnet pack src/Bdcf.Extensions.Web/Bdcf.Extensions.Web.csproj @packArgs
           dotnet pack src/Bdcf.Extensions.DacPac/Bdcf.Extensions.DacPac.csproj @packArgs
         
-      - name: Publish
+      - name: Publish packages
         shell: pwsh
         run: dotnet nuget push "nupkg/*.nupkg" --source "https://nuget.pkg.github.com/bdemarzo/index.json" --api-key ${{ secrets.NUGET_TOKEN }} --skip-duplicate
+
+      - name: Publish symbol packages
+        shell: pwsh
+        run: dotnet nuget push "nupkg/*.snupkg" --source "https://nuget.pkg.github.com/bdemarzo/index.json" --api-key ${{ secrets.NUGET_TOKEN }} --skip-duplicate
 
       - name: Release
         uses: softprops/action-gh-release@v2

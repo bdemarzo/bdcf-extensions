@@ -44,6 +44,16 @@ public class ClaimsPrincipalExtensionsTests
 		Assert.Equal(default, result);
 	}
 
+	[Fact]
+	public void GetClaim_ShouldReturnNull_WhenNullableClaimIsInvalidForType()
+	{
+		var principal = CreatePrincipalWithClaims(new Claim("invalid_nullable_claim", "not_an_integer"));
+
+		var result = principal.GetClaim<int?>("invalid_nullable_claim");
+
+		Assert.Null(result);
+	}
+
 	[Theory]
 	[InlineData("456", 456)]
 	[InlineData("false", false)]
@@ -74,5 +84,14 @@ public class ClaimsPrincipalExtensionsTests
 
 		var exception = Assert.Throws<SecurityException>(() => principal.GetRequiredClaim<int>("bad_claim"));
 		Assert.Contains("Required claim bad_claim could not be converted to Int32.", exception.Message);
+	}
+
+	[Fact]
+	public void GetRequiredClaim_ShouldThrowException_WhenNullableClaimIsInvalidForType()
+	{
+		var principal = CreatePrincipalWithClaims(new Claim("bad_nullable_claim", "invalid_number"));
+
+		var exception = Assert.Throws<SecurityException>(() => principal.GetRequiredClaim<int?>("bad_nullable_claim"));
+		Assert.Contains("Required claim bad_nullable_claim could not be converted to Int32.", exception.Message);
 	}
 }
