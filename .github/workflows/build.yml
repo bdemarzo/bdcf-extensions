@@ -7,7 +7,39 @@ on:
     branches: [ main ]
 
 jobs:
-  build:
+  unit-tests:
+    name: Unit tests (${{ matrix.os }})
+    runs-on: ${{ matrix.os }}
+
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ ubuntu-latest, windows-latest ]
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Setup .NET
+      uses: actions/setup-dotnet@v4
+      with:
+        dotnet-version: '8.x'
+
+    - name: Restore dependencies
+      run: dotnet restore Bdcf.Extensions.sln
+
+    - name: Build
+      run: dotnet build Bdcf.Extensions.sln --configuration Release --no-restore
+
+    - name: Test unit projects
+      shell: pwsh
+      run: |
+        dotnet test tests/Bdcf.Extensions.Tests/Bdcf.Extensions.Tests.csproj --configuration Release --no-build
+        dotnet test tests/Bdcf.Extensions.Web.Tests/Bdcf.Extensions.Web.Tests.csproj --configuration Release --no-build
+        dotnet test tests/Bdcf.Extensions.DacPac.Tests/Bdcf.Extensions.DacPac.Tests.csproj --configuration Release --no-build
+
+  integration-tests:
+    name: Integration tests
     runs-on: windows-latest
 
     steps:
@@ -25,5 +57,5 @@ jobs:
     - name: Build
       run: dotnet build Bdcf.Extensions.sln --configuration Release --no-restore
 
-    - name: Test
-      run: dotnet test Bdcf.Extensions.sln --configuration Release --no-build
+    - name: Test DacPac integration project
+      run: dotnet test tests/Bdcf.Extensions.DacPac.IntegrationTests/Bdcf.Extensions.DacPac.IntegrationTests.csproj --configuration Release --no-build

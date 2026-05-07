@@ -1,0 +1,43 @@
+<Project>
+	<PropertyGroup>
+		<ImplicitUsings>enable</ImplicitUsings>
+		<LangVersion>latest</LangVersion>
+		<Nullable>enable</Nullable>
+		<DebugType>portable</DebugType>
+		<Deterministic>true</Deterministic>
+		<PackageId>$(MSBuildProjectName)</PackageId>
+		<Company>BDCF, LLC</Company>
+		<Authors>Brian DeMarzo</Authors>
+		<Product>BDCF Extensions</Product>
+		<Description>Reusable .NET extension methods and helpers for BDCF applications.</Description>
+		<PackageReadmeFile>README.md</PackageReadmeFile>
+		<PackageLicenseExpression>MIT</PackageLicenseExpression>
+		<PackageProjectUrl>https://github.com/bdemarzo/bdcf-extensions</PackageProjectUrl>
+		<RepositoryUrl>https://github.com/bdemarzo/bdcf-extensions.git</RepositoryUrl>
+		<RepositoryType>git</RepositoryType>
+		<PublishRepositoryUrl>true</PublishRepositoryUrl>
+		<EmbedUntrackedSources>true</EmbedUntrackedSources>
+		<GenerateDocumentationFile>true</GenerateDocumentationFile>
+		<NoWarn>$(NoWarn);1591</NoWarn>
+		<IncludeSymbols>true</IncludeSymbols>
+		<SymbolPackageFormat>snupkg</SymbolPackageFormat>
+		<EnablePackageValidation>true</EnablePackageValidation>
+		<PackageReleaseNotes>See CHANGELOG.md for release history and release policy.</PackageReleaseNotes>
+	</PropertyGroup>
+
+	<ItemGroup>
+		<PackageReference Include="Microsoft.CodeAnalysis.NetAnalyzers">
+			<PrivateAssets>all</PrivateAssets>
+			<IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+		</PackageReference>
+		<PackageReference Include="Microsoft.SourceLink.GitHub">
+			<PrivateAssets>all</PrivateAssets>
+			<IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+		</PackageReference>
+	</ItemGroup>
+
+	<ItemGroup>
+		<None Include="$(MSBuildThisFileDirectory)README.md" Pack="true" PackagePath="\" />
+		<None Include="$(MSBuildThisFileDirectory)CHANGELOG.md" Pack="true" PackagePath="\" Condition="Exists('$(MSBuildThisFileDirectory)CHANGELOG.md')" />
+	</ItemGroup>
+</Project>

@@ -1,0 +1,17 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+	<PropertyGroup>
+		<TargetFramework>net8.0</TargetFramework>
+		<Description>ASP.NET Core MVC, Razor, routing, HTTP, HTMX, TempData, and model-binding helpers for BDCF applications.</Description>
+		<PackageTags>bdcf;extensions;aspnetcore;mvc;razor;http;htmx;routing</PackageTags>
+	</PropertyGroup>
+
+	<ItemGroup>
+		<FrameworkReference Include="Microsoft.AspNetCore.App" />
+	</ItemGroup>
+
+	<ItemGroup>
+		<ProjectReference Include="..\Bdcf.Extensions\Bdcf.Extensions.csproj" />
+	</ItemGroup>
+
+</Project>

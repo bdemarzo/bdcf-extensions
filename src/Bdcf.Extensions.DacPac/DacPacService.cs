@@ -1,0 +1,211 @@
+using Microsoft.Extensions.Options;
+using Microsoft.Extensions.Logging;
+using Microsoft.SqlServer.Dac;
+using System.Data.Common;
+using System.Reflection;
+using System.Configuration;
+using Microsoft.Extensions.Configuration;
+
+namespace Bdcf.Extensions.DacPac;
+
+/// <summary>
+/// Provides functionality for deploying a DACPAC (Data-tier Application Component Package) to a database.
+/// </summary>
+public class DacPacService : IDacPacService
+{
+	private readonly DacPacOptions _options;
+	private readonly ILogger<DacPacService> _logger;
+	private readonly IConfiguration? _configuration;
+
+	/// <summary>
+	/// Initializes a new instance of the <see cref="DacPacService"/> class.
+	/// </summary>
+	/// <param name="options">The configuration options for the DacPac service.</param>
+	/// <param name="logger">The logger instance used to log diagnostic and operational information.</param>
+	public DacPacService(IOptions<DacPacOptions> options, ILogger<DacPacService> logger)
+	{
+		_options = options.Value;
+		_logger = logger;
+	}
+
+	/// <summary>
+	/// Initializes a new instance of the <see cref="DacPacService"/> class with access to application configuration.
+	/// </summary>
+	/// <param name="options">The configuration options for the DacPac service.</param>
+	/// <param name="logger">The logger instance used to log diagnostic and operational information.</param>
+	/// <param name="configuration">The application configuration used to resolve named connection strings from appsettings.</param>
+	public DacPacService(IOptions<DacPacOptions> options, ILogger<DacPacService> logger, IConfiguration configuration)
+		: this(options, logger)
+	{
+		_configuration = configuration;
+	}
+
+	/// <summary>
+	/// Deploys a Data-tier Application Component Package (DACPAC) to the target database specified in the connection
+	/// string.
+	/// </summary>
+	public void ApplyDacPac()
+	{
+		var connectionString = _options.ConnectionString;
+		if (!string.IsNullOrWhiteSpace(_options.ConnectionStringName))
+		{
+			string? namedConnectionString = null;
+			if (_configuration is not null)
+			{
+				namedConnectionString = _configuration.GetConnectionString(_options.ConnectionStringName);
+			}
+
+			if (string.IsNullOrWhiteSpace(namedConnectionString))
+			{
+				var named = ConfigurationManager.ConnectionStrings[_options.ConnectionStringName];
+				if (!string.IsNullOrWhiteSpace(named?.ConnectionString))
+				{
+					namedConnectionString = named.ConnectionString;
+				}
+			}
+
+			if (!string.IsNullOrWhiteSpace(namedConnectionString))
+			{
+				connectionString = namedConnectionString;
+			}
+		}
+		var databaseName = GetDatabaseNameFromConnectionString(connectionString);
+		if (string.IsNullOrWhiteSpace(databaseName))
+			throw new InvalidOperationException("Database name could not be extracted from the connection string.");
+
+		using var dacPacStream = GetDacPacStream(_options);
+
+		var dacServices = new DacServices(connectionString);
+		dacServices.Message += (sender, e) =>
+		{
+			var message = e.Message;
+			switch (message.MessageType)
+			{
+				case DacMessageType.Error:
+					_logger.LogError(message.Message);
+					break;
+				case DacMessageType.Warning:
+					_logger.LogWarning(message.Message);
+					break;
+				default:
+					_logger.LogInformation(message.Message);
+					break;
+			}
+		};
+		DacDeployOptions deployOptions = new()
+		{
+			BlockOnPossibleDataLoss = _options.BlockOnPossibleDataLoss,
+			GenerateSmartDefaults = _options.GenerateSmartDefaults,
+			LongRunningCommandTimeout = _options.LongRunningCommandTimeout,
+			DropObjectsNotInSource = _options.DropObjectsNotInSource,
+			VerifyDeployment = _options.VerifyDeployment
+		};
+
+		using DacPackage dacPackage = DacPackage.Load(dacPacStream);
+		_logger.LogInformation("Starting DACPAC deployment...");
+		dacServices.Deploy(dacPackage, databaseName, true, deployOptions);
+		_logger.LogInformation("DACPAC deployment completed.");
+	}
+
+	/// <inheritdoc />
+	public Task ApplyDacPacAsync(CancellationToken cancellationToken = default)
+	{
+		cancellationToken.ThrowIfCancellationRequested();
+		return Task.Run(ApplyDacPac, cancellationToken);
+	}
+
+	/// <summary>
+	/// Extracts the database name from the provided connection string.
+	/// If the database name can not be extracted, null is returned.
+	/// </summary>
+	/// <param name="connectionString">A connection string.</param>
+	/// <returns>The database name parsed from the connection string.</returns>
+	protected static string? GetDatabaseNameFromConnectionString(string connectionString)
+	{
+		var builder = new DbConnectionStringBuilder { ConnectionString = connectionString };
+		if (builder.TryGetValue("Initial Catalog", out var databaseName))
+		{
+			return databaseName.ToString();
+		}
+		else if (builder.TryGetValue("Database", out databaseName))
+		{
+			return databaseName.ToString();
+		}
+
+		return null;
+	}
+
+	/// <summary>
+	/// Retrieves a stream for an embedded DacPac resource from the specified assembly.
+	/// </summary>
+	/// <param name="assemblyName">The name of the assembly containing the embedded DacPac resource.</param>
+	/// <param name="dacPacName">The name of the embedded DacPac resource to retrieve. This must match the resource name exactly.</param>
+	/// <returns>A <see cref="Stream"/> representing the embedded DacPac resource.</returns>
+	/// <exception cref="InvalidOperationException">Thrown if the assembly name is not configured.</exception>
+	/// <exception cref="FileNotFoundException">Thrown if the specified DacPac resource cannot be found in the assembly.</exception>
+	protected static Stream GetDacPacStream(string? assemblyName, string dacPacName)
+	{
+		if (string.IsNullOrWhiteSpace(assemblyName))
+		{
+			throw new InvalidOperationException("DACPAC resource assembly must be configured.");
+		}
+
+		var assembly = Assembly.Load(assemblyName);
+
+		return assembly.GetManifestResourceStream(dacPacName) ?? throw new FileNotFoundException($"Unable to load embedded DacPac {dacPacName}");
+	}
+
+	/// <summary>
+	/// Retrieves a stream for an embedded DacPac resource from the assembly specified in the provided options.
+	/// </summary>
+	/// <param name="options">The options used to resolve the resource assembly and name.</param>
+	/// <returns>A <see cref="Stream"/> representing the embedded DacPac resource.</returns>
+	/// <exception cref="InvalidOperationException">Thrown if no resource assembly is configured.</exception>
+	/// <exception cref="FileNotFoundException">Thrown if the specified DacPac resource cannot be found in the assembly.</exception>
+	protected static Stream GetDacPacStream(DacPacOptions options)
+	{
+		var assembly = ResolveDacPacAssembly(options);
+
+		return assembly.GetManifestResourceStream(options.DacPacName) ??
+			throw new FileNotFoundException($"Unable to load embedded DacPac {options.DacPacName} from assembly {assembly.FullName}");
+	}
+
+	private static Assembly ResolveDacPacAssembly(DacPacOptions options)
+	{
+		if (options.DacPacAssembly is not null)
+		{
+			return options.DacPacAssembly;
+		}
+
+		if (options.DacPacResourceMarkerType is not null)
+		{
+			return options.DacPacResourceMarkerType.Assembly;
+		}
+
+		if (!string.IsNullOrWhiteSpace(options.AssemblyName))
+		{
+			return Assembly.Load(options.AssemblyName);
+		}
+
+		throw new InvalidOperationException(
+			"DACPAC resource assembly must be configured using DacPacAssembly, DacPacResourceMarkerType, or AssemblyName.");
+	}
+
+	/// <summary>
+	/// Creates and configures a <see cref="DacDeployOptions"/> instance based on the specified <see
+	/// cref="DacPacOptions"/>.
+	/// </summary>
+	/// <param name="options">The <see cref="DacPacOptions"/> containing deployment settings to apply.</param>
+	/// <returns>A <see cref="DacDeployOptions"/> instance configured with the values from <paramref name="options"/>.</returns>
+	protected static DacDeployOptions GetDacDeployOptions(DacPacOptions options)
+	{
+		return new DacDeployOptions
+		{
+			BlockOnPossibleDataLoss = options.BlockOnPossibleDataLoss,
+			GenerateSmartDefaults = options.GenerateSmartDefaults,
+			LongRunningCommandTimeout = options.LongRunningCommandTimeout,
+			DropObjectsNotInSource = options.DropObjectsNotInSource,
+			VerifyDeployment = options.VerifyDeployment
+		};
+	}
+}
