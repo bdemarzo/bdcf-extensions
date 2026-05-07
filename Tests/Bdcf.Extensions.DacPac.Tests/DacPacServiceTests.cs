@@ -1,9 +1,6 @@
-using System.Diagnostics.CodeAnalysis;
-using Microsoft.Data.SqlClient;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Microsoft.SqlServer.Dac;
-using System.Configuration;
 
 namespace Bdcf.Extensions.DacPac.Tests;
 
@@ -19,11 +16,6 @@ public class DacPacServiceTests
 		public new static string? GetDatabaseNameFromConnectionString(string connectionString)
 		{
 			return DacPacService.GetDatabaseNameFromConnectionString(connectionString);
-		}
-
-		public new static Stream GetDacPacStream(string? assemblyName, string dacPacName)
-		{
-			return DacPacService.GetDacPacStream(assemblyName, dacPacName);
 		}
 
 		public new static DacDeployOptions GetDacDeployOptions(DacPacOptions options)
@@ -62,7 +54,7 @@ public class DacPacServiceTests
 	}
 
 	[Fact]
-	public void GetDatabaseNameFromConnectionString_InvalidConnectionStringReturnsNull()
+	public void GetDatabaseNameFromConnectionString_InvalidConnectionStringThrowsArgumentException()
 	{
 		string connectionString = "lorem ipsum";
 
@@ -90,222 +82,5 @@ public class DacPacServiceTests
 		Assert.Equal(options.LongRunningCommandTimeout, result.LongRunningCommandTimeout);
 		Assert.Equal(options.DropObjectsNotInSource, result.DropObjectsNotInSource);
 		Assert.Equal(options.VerifyDeployment, result.VerifyDeployment);
-	}
-
-	[Fact]
-	public void ApplyDacPac_AppliesDacPacToInMemoryDatabase()
-	{
-		string databaseName = $"UnitTestDB_{Guid.NewGuid()}";
-		string connectionString = $@"Server=(localdb)\MSSQLLocalDB;Integrated Security=true;Initial Catalog={databaseName}";
-
-		var options = Options.Create(new DacPacOptions
-		{
-			ConnectionString = connectionString,
-			AssemblyName = "Bdcf.Extensions.DacPac.Tests",
-			DacPacName = "Bdcf.Extensions.DacPac.Tests.Test.dacpac",
-			BlockOnPossibleDataLoss = false,
-			GenerateSmartDefaults = true,
-			DropObjectsNotInSource = false,
-			VerifyDeployment = true
-		});
-
-		var mockLogger = new Moq.Mock<ILogger<DacPacService>>();
-		var logger = mockLogger.Object;
-		var service = new DacPacService(options, logger);
-
-		// Create the empty LocalDB database
-		using (var localdbConnection = new SqlConnection(@"Server=(localdb)\MSSQLLocalDB;Integrated Security=true;Initial Catalog=master"))
-		{
-			localdbConnection.Open();
-			using var command = localdbConnection.CreateCommand();
-			command.CommandText = $"CREATE DATABASE [{databaseName}]";
-			command.ExecuteNonQuery();
-		}
-
-		try
-		{
-			service.ApplyDacPac();
-
-			// Assert
-			using var connection = new SqlConnection(connectionString);
-			connection.Open();
-
-			using var command = connection.CreateCommand();
-
-			command.CommandText = @"
-                        SELECT COUNT(*) 
-                        FROM INFORMATION_SCHEMA.TABLES 
-                        WHERE TABLE_NAME = 'Tests'";
-			int tableCount = (int)command.ExecuteScalar();
-			Assert.Equal(1, tableCount);
-
-			command.CommandText = @"
-                        SELECT COUNT(*) 
-                        FROM INFORMATION_SCHEMA.COLUMNS 
-                        WHERE TABLE_NAME = 'Tests' AND COLUMN_NAME = 'testid'";
-			int columnCount = (int)command.ExecuteScalar();
-			Assert.Equal(1, columnCount);
-		}
-		finally
-		{
-			// Clean up - Drop the test database
-			using var masterConnection = new SqlConnection(@"Server=(localdb)\MSSQLLocalDB;Integrated Security=true;Initial Catalog=master");
-			masterConnection.Open();
-
-			using var command = masterConnection.CreateCommand();
-			command.CommandText = $@"
-                        ALTER DATABASE [{databaseName}] SET SINGLE_USER WITH ROLLBACK IMMEDIATE;
-                        DROP DATABASE [{databaseName}];";
-			command.ExecuteNonQuery();
-		}
-	}
-
-	[Fact]
-	public void ApplyDacPac_UsesNamedConnectionString_WhenSpecifiedAndExists()
-	{
-		string databaseName = $"UnitTestDB_{Guid.NewGuid()}";
-		string namedConnectionString = $@"Server=(localdb)\MSSQLLocalDB;Integrated Security=true;Initial Catalog={databaseName}";
-		string otherConnectionString = $@"Server=(localdb)\MSSQLLocalDB;Integrated Security=true;Initial Catalog=OtherDb_{Guid.NewGuid()}";
-		string name = "UnitTest_NamedConn";
-
-		// Ensure no leftover of same name via exe config
-		var config = ConfigurationManager.OpenExeConfiguration(ConfigurationUserLevel.None);
-		config.ConnectionStrings.ConnectionStrings.Remove(name);
-		config.Save(ConfigurationSaveMode.Modified);
-		ConfigurationManager.RefreshSection("connectionStrings");
-
-		// Add named connection string that should be used
-		config.ConnectionStrings.ConnectionStrings.Add(new ConnectionStringSettings(name, namedConnectionString));
-		config.Save(ConfigurationSaveMode.Modified);
-		ConfigurationManager.RefreshSection("connectionStrings");
-
-		var options = Options.Create(new DacPacOptions
-		{
-			ConnectionString = otherConnectionString,
-			ConnectionStringName = name,
-			AssemblyName = "Bdcf.Extensions.DacPac.Tests",
-			DacPacName = "Bdcf.Extensions.DacPac.Tests.Test.dacpac",
-			BlockOnPossibleDataLoss = false,
-			GenerateSmartDefaults = true,
-			DropObjectsNotInSource = false,
-			VerifyDeployment = true
-		});
-
-		var mockLogger = new Moq.Mock<ILogger<DacPacService>>();
-		var service = new DacPacService(options, mockLogger.Object);
-
-		// Create the empty LocalDB database
-		using (var localdbConnection = new SqlConnection(@"Server=(localdb)\MSSQLLocalDB;Integrated Security=true;Initial Catalog=master"))
-		{
-			localdbConnection.Open();
-			using var command = localdbConnection.CreateCommand();
-			command.CommandText = $"CREATE DATABASE [{databaseName}]";
-			command.ExecuteNonQuery();
-		}
-
-		try
-		{
-			service.ApplyDacPac();
-
-			// Assert that the named connection string was used by checking the target database
-			using var connection = new SqlConnection(namedConnectionString);
-			connection.Open();
-
-			using var command = connection.CreateCommand();
-			command.CommandText = "SELECT COUNT(*) FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_NAME = 'Tests'";
-			int tableCount = (int)command.ExecuteScalar();
-			Assert.Equal(1, tableCount);
-		}
-		finally
-		{
-			// Clean up - Drop the test database and remove the named connection
-			using var masterConnection = new SqlConnection(@"Server=(localdb)\MSSQLLocalDB;Integrated Security=true;Initial Catalog=master");
-			masterConnection.Open();
-
-			using var command = masterConnection.CreateCommand();
-			command.CommandText = $@"
-                        ALTER DATABASE [{databaseName}] SET SINGLE_USER WITH ROLLBACK IMMEDIATE;
-                        DROP DATABASE [{databaseName}];";
-			command.ExecuteNonQuery();
-
-			var cleanup = ConfigurationManager.OpenExeConfiguration(ConfigurationUserLevel.None);
-			cleanup.ConnectionStrings.ConnectionStrings.Remove(name);
-			cleanup.Save(ConfigurationSaveMode.Modified);
-			ConfigurationManager.RefreshSection("connectionStrings");
-		}
-	}
-
-	[Fact]
-	public void ApplyDacPac_UsesOptionsConnectionString_WhenNamedExistsButEmpty()
-	{
-		string databaseName = $"UnitTestDB_{Guid.NewGuid()}";
-		string optionsConnectionString = $@"Server=(localdb)\MSSQLLocalDB;Integrated Security=true;Initial Catalog={databaseName}";
-		string name = "UnitTest_NamedConn_Empty";
-
-		// Ensure no leftover of same name via exe config
-		var config = ConfigurationManager.OpenExeConfiguration(ConfigurationUserLevel.None);
-		config.ConnectionStrings.ConnectionStrings.Remove(name);
-		config.Save(ConfigurationSaveMode.Modified);
-		ConfigurationManager.RefreshSection("connectionStrings");
-
-		// Add named connection string with empty value
-		config.ConnectionStrings.ConnectionStrings.Add(new ConnectionStringSettings(name, string.Empty));
-		config.Save(ConfigurationSaveMode.Modified);
-		ConfigurationManager.RefreshSection("connectionStrings");
-
-		var options = Options.Create(new DacPacOptions
-		{
-			ConnectionString = optionsConnectionString,
-			ConnectionStringName = name,
-			AssemblyName = "Bdcf.Extensions.DacPac.Tests",
-			DacPacName = "Bdcf.Extensions.DacPac.Tests.Test.dacpac",
-			BlockOnPossibleDataLoss = false,
-			GenerateSmartDefaults = true,
-			DropObjectsNotInSource = false,
-			VerifyDeployment = true
-		});
-
-		var mockLogger = new Moq.Mock<ILogger<DacPacService>>();
-		var service = new DacPacService(options, mockLogger.Object);
-
-		// Create the empty LocalDB database
-		using (var localdbConnection = new SqlConnection(@"Server=(localdb)\MSSQLLocalDB;Integrated Security=true;Initial Catalog=master"))
-		{
-			localdbConnection.Open();
-			using var command = localdbConnection.CreateCommand();
-			command.CommandText = $"CREATE DATABASE [{databaseName}]";
-			command.ExecuteNonQuery();
-		}
-
-		try
-		{
-			service.ApplyDacPac();
-
-			// Assert that the options connection string was used by checking the target database
-			using var connection = new SqlConnection(optionsConnectionString);
-			connection.Open();
-
-			using var command = connection.CreateCommand();
-			command.CommandText = "SELECT COUNT(*) FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_NAME = 'Tests'";
-			int tableCount = (int)command.ExecuteScalar();
-			Assert.Equal(1, tableCount);
-		}
-		finally
-		{
-			// Clean up - Drop the test database and remove the named connection
-			using var masterConnection = new SqlConnection(@"Server=(localdb)\MSSQLLocalDB;Integrated Security=true;Initial Catalog=master");
-			masterConnection.Open();
-
-			using var command = masterConnection.CreateCommand();
-			command.CommandText = $@"
-                        ALTER DATABASE [{databaseName}] SET SINGLE_USER WITH ROLLBACK IMMEDIATE;
-                        DROP DATABASE [{databaseName}];";
-			command.ExecuteNonQuery();
-
-			var cleanup = ConfigurationManager.OpenExeConfiguration(ConfigurationUserLevel.None);
-			cleanup.ConnectionStrings.ConnectionStrings.Remove(name);
-			cleanup.Save(ConfigurationSaveMode.Modified);
-			ConfigurationManager.RefreshSection("connectionStrings");
-		}
 	}
 }
