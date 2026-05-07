@@ -12,7 +12,7 @@ public partial class KebabCaseOutboundParameterTransformer : IOutboundParameterT
 	/// <inheritdoc />
 	public string? TransformOutbound(object? value)
 	{
-		return value is null ? null : WordBreaks().Replace(value.ToString() ?? string.Empty, "-$1$2").ToLower();
+		return value is null ? null : WordBreaks().Replace(value.ToString() ?? string.Empty, "-$1$2").ToLowerInvariant();
 	}
 
 	[GeneratedRegex(@"(?<=[a-z0-9])([A-Z])|(?<=[A-Z])([A-Z])(?=[a-z])")]
