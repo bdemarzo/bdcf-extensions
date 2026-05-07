@@ -22,6 +22,9 @@ EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Config", "Config", "{2A64C51E-96C6-49E4-B92B-3FB2F4648487}"
 	ProjectSection(SolutionItems) = preProject
 		.editorconfig = .editorconfig
+		Directory.Build.props = Directory.Build.props
+		Directory.Packages.props = Directory.Packages.props
+		NuGet.config = NuGet.config
 	EndProjectSection
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Bdcf.Extensions.DacPac", "Bdcf.Extensions.DacPac\Bdcf.Extensions.DacPac.csproj", "{93E1176A-E528-4219-ACC7-869CB895AEE9}"
