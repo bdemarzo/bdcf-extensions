@@ -83,4 +83,19 @@ public class DacPacServiceTests
 		Assert.Equal(options.DropObjectsNotInSource, result.DropObjectsNotInSource);
 		Assert.Equal(options.VerifyDeployment, result.VerifyDeployment);
 	}
+
+	[Fact]
+	public async Task ApplyDacPacAsync_CanceledBeforeStart_ThrowsOperationCanceledException()
+	{
+		var options = Options.Create(new DacPacOptions
+		{
+			ConnectionString = string.Empty,
+			DacPacName = string.Empty
+		});
+		var service = new DacPacService(options, Moq.Mock.Of<ILogger<DacPacService>>());
+		using var cancellationTokenSource = new CancellationTokenSource();
+		cancellationTokenSource.Cancel();
+
+		await Assert.ThrowsAsync<OperationCanceledException>(() => service.ApplyDacPacAsync(cancellationTokenSource.Token));
+	}
 }

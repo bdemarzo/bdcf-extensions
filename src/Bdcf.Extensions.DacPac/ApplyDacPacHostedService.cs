@@ -17,12 +17,12 @@ internal sealed class ApplyDacPacHostedService : IHostedService
 		_failOnError = options?.Value?.FailOnError ?? false;
 	}
 
-	public Task StartAsync(CancellationToken cancellationToken)
+	public async Task StartAsync(CancellationToken cancellationToken)
 	{
 		_logger.LogInformation("Applying DACPAC at startup...");
 		try
 		{
-			_dacPacService.ApplyDacPac();
+			await _dacPacService.ApplyDacPacAsync(cancellationToken).ConfigureAwait(false);
 			_logger.LogInformation("DACPAC applied successfully at startup.");
 		}
 		catch (Exception ex)
@@ -34,8 +34,6 @@ internal sealed class ApplyDacPacHostedService : IHostedService
 				throw;
 			}
 		}
-
-		return Task.CompletedTask;
 	}
 
 	public Task StopAsync(CancellationToken cancellationToken) => Task.CompletedTask;

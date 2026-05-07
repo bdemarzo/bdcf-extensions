@@ -1,3 +1,5 @@
+using System.Reflection;
+
 namespace Bdcf.Extensions.DacPac;
 
 /// <summary>
@@ -21,9 +23,21 @@ public record DacPacOptions
 
 	/// <summary>
 	/// Specifies the name of the assembly where the dacpac file is stored (as an embedded resource).
-	/// If left null, the current executing assembly will be used.
+	/// This is useful for configuration-bound options.
 	/// </summary>
 	public string? AssemblyName { get; init; }
+
+	/// <summary>
+	/// Specifies the assembly where the dacpac file is stored as an embedded resource.
+	/// This is preferred when configuring options in code.
+	/// </summary>
+	public Assembly? DacPacAssembly { get; init; }
+
+	/// <summary>
+	/// Specifies a type in the assembly where the dacpac file is stored as an embedded resource.
+	/// This is a convenient alternative to setting <see cref="DacPacAssembly"/> directly.
+	/// </summary>
+	public Type? DacPacResourceMarkerType { get; init; }
 
 	/// <summary>
 	/// Specifies the name of the dacpac file as it is stored in the assembly.

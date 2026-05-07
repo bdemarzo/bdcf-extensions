@@ -73,7 +73,7 @@ public class DacPacService : IDacPacService
 		if (string.IsNullOrWhiteSpace(databaseName))
 			throw new InvalidOperationException("Database name could not be extracted from the connection string.");
 
-		var dacPacStream = GetDacPacStream(_options.AssemblyName, _options.DacPacName);
+		using var dacPacStream = GetDacPacStream(_options);
 
 		var dacServices = new DacServices(connectionString);
 		dacServices.Message += (sender, e) =>
@@ -107,6 +107,13 @@ public class DacPacService : IDacPacService
 		_logger.LogInformation("DACPAC deployment completed.");
 	}
 
+	/// <inheritdoc />
+	public Task ApplyDacPacAsync(CancellationToken cancellationToken = default)
+	{
+		cancellationToken.ThrowIfCancellationRequested();
+		return Task.Run(ApplyDacPac, cancellationToken);
+	}
+
 	/// <summary>
 	/// Extracts the database name from the provided connection string.
 	/// If the database name can not be extracted, null is returned.
@@ -131,16 +138,54 @@ public class DacPacService : IDacPacService
 	/// <summary>
 	/// Retrieves a stream for an embedded DacPac resource from the specified assembly.
 	/// </summary>
-	/// <param name="assemblyName">The name of the assembly containing the embedded DacPac resource. If <see langword="null"/>,  the currently
-	/// executing assembly is used.</param>
+	/// <param name="assemblyName">The name of the assembly containing the embedded DacPac resource. If <see langword="null"/>, the entry assembly is used when available.</param>
 	/// <param name="dacPacName">The name of the embedded DacPac resource to retrieve. This must match the resource name exactly.</param>
 	/// <returns>A <see cref="Stream"/> representing the embedded DacPac resource.</returns>
 	/// <exception cref="FileNotFoundException">Thrown if the specified DacPac resource cannot be found in the assembly.</exception>
 	protected static Stream GetDacPacStream(string? assemblyName, string dacPacName)
 	{
-		var assembly = assemblyName is null ? Assembly.GetExecutingAssembly() : Assembly.Load(assemblyName);
+		var assembly = assemblyName is null ? GetDefaultDacPacAssembly() : Assembly.Load(assemblyName);
 
 		return assembly.GetManifestResourceStream(dacPacName) ?? throw new FileNotFoundException($"Unable to load embedded DacPac {dacPacName}");
+	}
+
+	/// <summary>
+	/// Retrieves a stream for an embedded DacPac resource from the assembly specified in the provided options.
+	/// </summary>
+	/// <param name="options">The options used to resolve the resource assembly and name.</param>
+	/// <returns>A <see cref="Stream"/> representing the embedded DacPac resource.</returns>
+	/// <exception cref="FileNotFoundException">Thrown if the specified DacPac resource cannot be found in the assembly.</exception>
+	protected static Stream GetDacPacStream(DacPacOptions options)
+	{
+		var assembly = ResolveDacPacAssembly(options);
+
+		return assembly.GetManifestResourceStream(options.DacPacName) ??
+			throw new FileNotFoundException($"Unable to load embedded DacPac {options.DacPacName} from assembly {assembly.FullName}");
+	}
+
+	private static Assembly ResolveDacPacAssembly(DacPacOptions options)
+	{
+		if (options.DacPacAssembly is not null)
+		{
+			return options.DacPacAssembly;
+		}
+
+		if (options.DacPacResourceMarkerType is not null)
+		{
+			return options.DacPacResourceMarkerType.Assembly;
+		}
+
+		if (!string.IsNullOrWhiteSpace(options.AssemblyName))
+		{
+			return Assembly.Load(options.AssemblyName);
+		}
+
+		return GetDefaultDacPacAssembly();
+	}
+
+	private static Assembly GetDefaultDacPacAssembly()
+	{
+		return Assembly.GetEntryAssembly() ?? Assembly.GetCallingAssembly();
 	}
 
 	/// <summary>

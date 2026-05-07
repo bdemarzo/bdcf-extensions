@@ -1,4 +1,5 @@
 using System.Configuration;
+using System.Reflection;
 using System.Runtime.InteropServices;
 using Microsoft.Data.SqlClient;
 using Microsoft.Extensions.Logging.Abstractions;
@@ -55,7 +56,10 @@ public class DacPacServiceIntegrationTests
 		{
 			AddNamedConnectionString(name, namedConnectionString);
 
-			var service = CreateService(otherConnectionString, connectionStringName: name);
+			var service = CreateService(
+				otherConnectionString,
+				connectionStringName: name,
+				dacPacAssembly: typeof(DacPacServiceIntegrationTests).Assembly);
 
 			service.ApplyDacPac();
 
@@ -84,7 +88,10 @@ public class DacPacServiceIntegrationTests
 		{
 			AddNamedConnectionString(name, string.Empty);
 
-			var service = CreateService(optionsConnectionString, connectionStringName: name);
+			var service = CreateService(
+				optionsConnectionString,
+				connectionStringName: name,
+				dacPacResourceMarkerType: typeof(DacPacServiceIntegrationTests));
 
 			service.ApplyDacPac();
 
@@ -97,13 +104,19 @@ public class DacPacServiceIntegrationTests
 		}
 	}
 
-	private static DacPacService CreateService(string connectionString, string connectionStringName = "")
+	private static DacPacService CreateService(
+		string connectionString,
+		string connectionStringName = "",
+		Assembly? dacPacAssembly = null,
+		Type? dacPacResourceMarkerType = null)
 	{
 		var options = Options.Create(new DacPacOptions
 		{
 			ConnectionString = connectionString,
 			ConnectionStringName = connectionStringName,
-			AssemblyName = TestDacPacAssemblyName,
+			AssemblyName = dacPacAssembly is null && dacPacResourceMarkerType is null ? TestDacPacAssemblyName : null,
+			DacPacAssembly = dacPacAssembly,
+			DacPacResourceMarkerType = dacPacResourceMarkerType,
 			DacPacName = TestDacPacResourceName,
 			BlockOnPossibleDataLoss = false,
 			GenerateSmartDefaults = true,
