@@ -30,7 +30,7 @@ public static class HtmlHelperExtensions
 	/// Fluent extension method for <see cref="IHtmlHelper"/> to conditionally render content based on whether an object is not null.
 	/// </summary>
 	/// <param name="htmlHelper">The HTML helper.</param>
-	/// <param name="condition">The condition.</param>
+	/// <param name="obj">The object.</param>
 	/// <returns>True if the object is null, false otherwise.</returns>
 	public static bool IfHasValue(this IHtmlHelper htmlHelper, object obj)
 	{

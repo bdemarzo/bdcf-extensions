@@ -1,5 +1,7 @@
 <Project Sdk="Microsoft.NET.Sdk">
 	<PropertyGroup>
 		<TargetFramework>net8.0</TargetFramework>
+		<Description>General-purpose .NET extension methods and validation helpers for strings, enums, objects, claims, types, booleans, decimals, and time spans.</Description>
+		<PackageTags>bdcf;extensions;dotnet;helpers;data-annotations;claims</PackageTags>
 	</PropertyGroup>
 </Project>

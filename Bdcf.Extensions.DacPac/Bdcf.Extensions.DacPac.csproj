@@ -2,6 +2,8 @@
 
 	<PropertyGroup>
 		<TargetFramework>net8.0</TargetFramework>
+		<Description>Helpers for applying embedded SQL Server DACPAC deployments from .NET hosts and application startup.</Description>
+		<PackageTags>bdcf;extensions;dacpac;sqlserver;database;deployment;hosting</PackageTags>
 	</PropertyGroup>
 
 	<ItemGroup>

@@ -8,7 +8,7 @@ public static class ClaimsPrincipalExtensions
 	/// <summary>
 	/// Gets the claim specified by <paramref name="claimType"/> from the <paramref name="principal"/> and returns it as the specified type.
 	/// </summary>
-	/// <typeparam name="T">The type of the claim value to return.</typeparam></typeparam>
+	/// <typeparam name="T">The type of the claim value to return.</typeparam>
 	/// <returns>The claim value, or the default of the value type.</returns>
 	public static T? GetClaim<T>(this ClaimsPrincipal principal, string claimType)
 	{
@@ -31,7 +31,7 @@ public static class ClaimsPrincipalExtensions
 	/// Gets the claim specified by <paramref name="claimType"/> from the <paramref name="principal"/> and returns it as the specified type.
 	/// If the claim is not found, a <see cref="SecurityException"/> is thrown.
 	/// </summary>
-	/// <typeparam name="T">The type of the claim value to return.</typeparam></typeparam>
+	/// <typeparam name="T">The type of the claim value to return.</typeparam>
 	/// <returns>The claim value.</returns>
 	public static T GetRequiredClaim<T>(this ClaimsPrincipal principal, string claimType)
 	{
