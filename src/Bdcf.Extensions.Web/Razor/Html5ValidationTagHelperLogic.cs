@@ -1,6 +1,7 @@
 using Bdcf.Extensions.DataAnnotations;
 using Microsoft.AspNetCore.Mvc.ModelBinding;
 using System.ComponentModel.DataAnnotations;
+using System.Globalization;
 
 namespace Bdcf.Extensions.Web.Razor;
 
@@ -40,7 +41,7 @@ public static class Html5ValidationTagHelperLogic
 
 	private static void ApplyPattern(ModelMetadata metadata, IDictionary<string, string> attributes)
 	{
-		var pattern = metadata.ValidatorMetadata.OfType<RegularExpressionAttribute>().SingleOrDefault();
+		var pattern = metadata.ValidatorMetadata.OfType<RegularExpressionAttribute>().FirstOrDefault();
 		if (pattern is not null)
 		{
 			attributes["pattern"] = pattern.Pattern;
@@ -49,7 +50,7 @@ public static class Html5ValidationTagHelperLogic
 
 	private static void ApplyNumberAttributes(ModelMetadata metadata, IDictionary<string, string> attributes)
 	{
-		var dataType = metadata.ValidatorMetadata.OfType<DataTypeAttribute>().SingleOrDefault()?.DataType;
+		var dataType = metadata.ValidatorMetadata.OfType<DataTypeAttribute>().FirstOrDefault()?.DataType;
 
 		if (dataType == DataType.Currency || metadata.ModelType == typeof(decimal) || metadata.ModelType == typeof(decimal?))
 		{
@@ -58,14 +59,14 @@ public static class Html5ValidationTagHelperLogic
 			var rangeAttribute = metadata.ValidatorMetadata.OfType<RangeAttribute>().FirstOrDefault();
 			if (rangeAttribute != null)
 			{
-				attributes["min"] = rangeAttribute.Minimum.ToString()!;
-				attributes["max"] = rangeAttribute.Maximum.ToString()!;
+				attributes["min"] = Convert.ToString(rangeAttribute.Minimum, CultureInfo.InvariantCulture)!;
+				attributes["max"] = Convert.ToString(rangeAttribute.Maximum, CultureInfo.InvariantCulture)!;
 			}
 
 			var precisionAttribute = metadata.ValidatorMetadata.OfType<PrecisionAttribute>().FirstOrDefault();
 			if (precisionAttribute is not null && precisionAttribute.DecimalPlaces > 0)
 			{
-				attributes["step"] = $"0.{new string('0', precisionAttribute.DecimalPlaces - 1)}1";
+				attributes["step"] = (1m / (decimal)Math.Pow(10, precisionAttribute.DecimalPlaces)).ToString(CultureInfo.InvariantCulture);
 			}
 		}
 	}
@@ -88,15 +89,15 @@ public static class Html5ValidationTagHelperLogic
 				{
 					case TimeSpanPrecision.Seconds:
 						attributes["placeholder"] = "h:mm:ss";
-						attributes["value"] = string.Format("{0}:{1:D2}:{2:D2}", (int)timeSpan.TotalHours, timeSpan.Minutes, timeSpan.Seconds);
+						attributes["value"] = string.Format(CultureInfo.InvariantCulture, "{0}:{1:D2}:{2:D2}", (int)timeSpan.TotalHours, timeSpan.Minutes, timeSpan.Seconds);
 						break;
 					case TimeSpanPrecision.Minutes:
 						attributes["placeholder"] = "h:mm";
-						attributes["value"] = string.Format("{0}:{1:D2}", (int)timeSpan.TotalHours, timeSpan.Minutes);
+						attributes["value"] = string.Format(CultureInfo.InvariantCulture, "{0}:{1:D2}", (int)timeSpan.TotalHours, timeSpan.Minutes);
 						break;
 					case TimeSpanPrecision.Hours:
 						attributes["placeholder"] = "h";
-						attributes["value"] = ((int)timeSpan.TotalHours).ToString();
+						attributes["value"] = ((int)timeSpan.TotalHours).ToString(CultureInfo.InvariantCulture);
 						break;
 				}
 			}

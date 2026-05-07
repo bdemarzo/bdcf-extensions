@@ -2,6 +2,7 @@ using Bdcf.Extensions.DataAnnotations;
 using Microsoft.AspNetCore.Mvc.ModelBinding;
 using Microsoft.AspNetCore.Mvc.ModelBinding.Metadata;
 using System.ComponentModel.DataAnnotations;
+using System.Globalization;
 
 namespace Bdcf.Extensions.Web.Razor.Tests;
 
@@ -67,6 +68,19 @@ public class Html5ValidationTagHelperLogicTests
 	}
 
 	[Fact]
+	public void AddsFirstPatternAttribute_WhenMultiplePatternAttributesExist()
+	{
+		var metadata = CreateMetadata(
+			typeof(string),
+			new RegularExpressionAttribute("^[a-z]+$"),
+			new RegularExpressionAttribute("^[0-9]+$"));
+		var attributes = new Dictionary<string, string>();
+		Html5ValidationTagHelperLogic.ApplyValidationAttributes(metadata, null, attributes);
+
+		Assert.Equal("^[a-z]+$", attributes["pattern"]);
+	}
+
+	[Fact]
 	public void AddsDecimalTypeWithPrecision()
 	{
 		var metadata = CreateMetadata(typeof(decimal), new DataTypeAttribute(DataType.Currency), new PrecisionAttribute { DecimalPlaces = 3 });
@@ -103,6 +117,40 @@ public class Html5ValidationTagHelperLogicTests
 		Assert.Equal("0.5", attributes["min"]);
 		Assert.Equal("99.5", attributes["max"]);
 		Assert.False(attributes.ContainsKey("step"));
+	}
+
+	[Fact]
+	public void AddsDecimalRange_UsesInvariantCulture()
+	{
+		CultureInfo? originalCulture = CultureInfo.CurrentCulture;
+		try
+		{
+			CultureInfo.CurrentCulture = CultureInfo.GetCultureInfo("fr-FR");
+
+			var metadata = CreateMetadata(typeof(decimal), new DataTypeAttribute(DataType.Currency), new RangeAttribute(0.5, 99.5));
+			var attributes = new Dictionary<string, string>();
+			Html5ValidationTagHelperLogic.ApplyValidationAttributes(metadata, null, attributes);
+
+			Assert.Equal("0.5", attributes["min"]);
+			Assert.Equal("99.5", attributes["max"]);
+		}
+		finally
+		{
+			CultureInfo.CurrentCulture = originalCulture;
+		}
+	}
+
+	[Fact]
+	public void AddsDecimalType_WhenMultipleDataTypeAttributesExist()
+	{
+		var metadata = CreateMetadata(
+			typeof(decimal),
+			new DataTypeAttribute(DataType.Currency),
+			new DataTypeAttribute(DataType.Text));
+		var attributes = new Dictionary<string, string>();
+		Html5ValidationTagHelperLogic.ApplyValidationAttributes(metadata, null, attributes);
+
+		Assert.Equal("number", attributes["type"]);
 	}
 
 	[Theory]
