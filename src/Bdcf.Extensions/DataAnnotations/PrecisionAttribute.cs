@@ -2,13 +2,27 @@ using System.ComponentModel.DataAnnotations;
 
 namespace Bdcf.Extensions.DataAnnotations;
 
+/// <summary>
+/// Validation attribute that normalizes decimal and <see cref="TimeSpan"/> values to a configured precision.
+/// </summary>
+/// <remarks>
+/// This attribute mutates the validated model property by assigning the truncated value during validation. It is intended
+/// for normalization, not pure validation.
+/// </remarks>
 [AttributeUsage(AttributeTargets.Property | AttributeTargets.Field, Inherited = false, AllowMultiple = false)]
 public class PrecisionAttribute : ValidationAttribute
 {
+	/// <summary>
+	/// Gets or sets the number of decimal places to preserve. A negative value disables decimal truncation.
+	/// </summary>
 	public int DecimalPlaces { get; set; } = -1;
 
+	/// <summary>
+	/// Gets or sets the precision to preserve for <see cref="TimeSpan"/> values.
+	/// </summary>
 	public TimeSpanPrecision TimeSpanPrecision { get; set; } = TimeSpanPrecision.None;
 
+	/// <inheritdoc />
 	protected override ValidationResult? IsValid(object? value, ValidationContext validationContext)
 	{
 		if (value is null)
@@ -32,19 +46,7 @@ public class PrecisionAttribute : ValidationAttribute
 			if (TimeSpanPrecision == TimeSpanPrecision.None)
 				return ValidationResult.Success; // No truncation needed
 
-			TimeSpan truncated = timeSpan;
-			switch (TimeSpanPrecision)
-			{
-				case TimeSpanPrecision.Hours:
-					truncated = new TimeSpan(timeSpan.Hours, 0, 0);
-					break;
-				case TimeSpanPrecision.Minutes:
-					truncated = new TimeSpan(timeSpan.Hours, timeSpan.Minutes, 0);
-					break;
-				case TimeSpanPrecision.Seconds:
-					truncated = new TimeSpan(timeSpan.Hours, timeSpan.Minutes, timeSpan.Seconds);
-					break;
-			}
+			TimeSpan truncated = TruncateTimeSpan(timeSpan, TimeSpanPrecision);
 			property.SetValue(validationContext.ObjectInstance, truncated);
 
 			return ValidationResult.Success;
@@ -53,5 +55,18 @@ public class PrecisionAttribute : ValidationAttribute
 		{
 			return new ValidationResult("This attribute can only be used with decimal and TimeSpan values.");
 		}
+	}
+
+	private static TimeSpan TruncateTimeSpan(TimeSpan timeSpan, TimeSpanPrecision precision)
+	{
+		long unitTicks = precision switch
+		{
+			TimeSpanPrecision.Hours => TimeSpan.TicksPerHour,
+			TimeSpanPrecision.Minutes => TimeSpan.TicksPerMinute,
+			TimeSpanPrecision.Seconds => TimeSpan.TicksPerSecond,
+			_ => 1
+		};
+
+		return TimeSpan.FromTicks(timeSpan.Ticks - (timeSpan.Ticks % unitTicks));
 	}
 }

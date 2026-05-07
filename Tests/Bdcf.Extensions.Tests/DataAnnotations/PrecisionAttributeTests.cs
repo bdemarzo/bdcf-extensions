@@ -38,28 +38,45 @@ public class PrecisionAttributeTests
 		Assert.Equal(expectedValue ?? 0m, model.Value);
 	}
 
-    [Theory]
+	[Theory]
 	[InlineData(1, 30, 45, TimeSpanPrecision.None, 1, 30, 45)]
 	[InlineData(1, 30, 45, TimeSpanPrecision.Hours, 1, 0, 0)]
-    [InlineData(2, 45, 59, TimeSpanPrecision.Minutes, 2, 45, 0)]
-    [InlineData(3, 15, 20, TimeSpanPrecision.Seconds, 3, 15, 20)]
-    [InlineData(0, 0, 0, TimeSpanPrecision.Minutes, 0, 0, 0)]
+	[InlineData(2, 45, 59, TimeSpanPrecision.Minutes, 2, 45, 0)]
+	[InlineData(3, 15, 20, TimeSpanPrecision.Seconds, 3, 15, 20)]
+	[InlineData(0, 0, 0, TimeSpanPrecision.Minutes, 0, 0, 0)]
+	[InlineData(26, 45, 59, TimeSpanPrecision.Hours, 26, 0, 0)]
+	[InlineData(26, 45, 59, TimeSpanPrecision.Minutes, 26, 45, 0)]
 	public void ValidationShouldAdjustTimeSpanPrecision(
-        int? hours, int? minutes, int? seconds,
-        TimeSpanPrecision precision,
-        int? expectedHours, int? expectedMinutes, int? expectedSeconds)
-    {
-        TimeSpan? input = hours.HasValue ? new TimeSpan(hours.Value, minutes!.Value, seconds!.Value) : (TimeSpan?)null;
-        var expected = expectedHours.HasValue ? new TimeSpan(expectedHours.Value, expectedMinutes!.Value, expectedSeconds!.Value) : (TimeSpan?)null;
+		int? hours, int? minutes, int? seconds,
+		TimeSpanPrecision precision,
+		int? expectedHours, int? expectedMinutes, int? expectedSeconds)
+	{
+		TimeSpan? input = hours.HasValue ? new TimeSpan(hours.Value, minutes!.Value, seconds!.Value) : (TimeSpan?)null;
+		var expected = expectedHours.HasValue ? new TimeSpan(expectedHours.Value, expectedMinutes!.Value, expectedSeconds!.Value) : (TimeSpan?)null;
 
-        var attribute = new PrecisionAttribute { TimeSpanPrecision = precision};
-        var model = new TimeSpanTestModel { Value = input ?? TimeSpan.Zero };
+		var attribute = new PrecisionAttribute { TimeSpanPrecision = precision };
+		var model = new TimeSpanTestModel { Value = input ?? TimeSpan.Zero };
 		var context = new ValidationContext(model) { MemberName = nameof(model.Value) };
 
-        var result = attribute.GetValidationResult(input, context);
+		var result = attribute.GetValidationResult(input, context);
 
-        // Assert
-        Assert.Equal(ValidationResult.Success, result);
-        Assert.Equal(expected, model.Value);
-    }
+		Assert.Equal(ValidationResult.Success, result);
+		Assert.Equal(expected, model.Value);
+	}
+
+	[Fact]
+	public void ValidationShouldTruncateTimeSpanFractionalSeconds()
+	{
+		var input = new TimeSpan(1, 2, 3, 4, 567);
+		var expected = new TimeSpan(1, 2, 3, 4);
+
+		var attribute = new PrecisionAttribute { TimeSpanPrecision = TimeSpanPrecision.Seconds };
+		var model = new TimeSpanTestModel { Value = input };
+		var context = new ValidationContext(model) { MemberName = nameof(model.Value) };
+
+		var result = attribute.GetValidationResult(input, context);
+
+		Assert.Equal(ValidationResult.Success, result);
+		Assert.Equal(expected, model.Value);
+	}
 }
