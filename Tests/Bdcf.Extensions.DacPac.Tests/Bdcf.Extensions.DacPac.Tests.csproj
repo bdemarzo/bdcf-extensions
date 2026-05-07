@@ -31,7 +31,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\..\Bdcf.Extensions.DacPac\Bdcf.Extensions.DacPac.csproj" />
+    <ProjectReference Include="..\..\src\Bdcf.Extensions.DacPac\Bdcf.Extensions.DacPac.csproj" />
   </ItemGroup>
 
   <ItemGroup>

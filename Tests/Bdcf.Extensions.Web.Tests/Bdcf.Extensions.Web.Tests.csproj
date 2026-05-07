@@ -27,7 +27,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\..\Bdcf.Extensions.Web\Bdcf.Extensions.Web.csproj" />
+    <ProjectReference Include="..\..\src\Bdcf.Extensions.Web\Bdcf.Extensions.Web.csproj" />
   </ItemGroup>
 
 </Project>

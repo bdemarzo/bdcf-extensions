@@ -21,7 +21,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\..\Bdcf.Extensions\Bdcf.Extensions.csproj" />
+    <ProjectReference Include="..\..\src\Bdcf.Extensions\Bdcf.Extensions.csproj" />
   </ItemGroup>
 
   <ItemGroup>
