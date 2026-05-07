@@ -13,7 +13,7 @@ public static class StringExtensions
 	{
 		if (s.Length > length)
 		{
-			return s[..length];
+			return s.Substring(0, length);
 		}
 		else
 		{

@@ -41,20 +41,42 @@ jobs:
           dotnet-version: '8.x'
 
       - name: Restore dependencies
-        run: dotnet restore Bdcf.Extensions.sln
+        run: dotnet restore Bdcf.Extensions.sln /p:ContinuousIntegrationBuild=true
 
       - name: Build
-        run: dotnet build Bdcf.Extensions.sln --configuration Release --no-restore
+        run: dotnet build Bdcf.Extensions.sln --configuration Release --no-restore /p:ContinuousIntegrationBuild=true
 
-      - name: Test
-        run: dotnet test Bdcf.Extensions.sln --configuration Release --no-build
+      - name: Test unit projects
+        shell: pwsh
+        run: |
+          dotnet test tests/Bdcf.Extensions.Tests/Bdcf.Extensions.Tests.csproj --configuration Release --no-build
+          dotnet test tests/Bdcf.Extensions.Web.Tests/Bdcf.Extensions.Web.Tests.csproj --configuration Release --no-build
+          dotnet test tests/Bdcf.Extensions.DacPac.Tests/Bdcf.Extensions.DacPac.Tests.csproj --configuration Release --no-build
+
+      - name: Test integration projects
+        run: dotnet test tests/Bdcf.Extensions.DacPac.IntegrationTests/Bdcf.Extensions.DacPac.IntegrationTests.csproj --configuration Release --no-build
 
       - name: Pack
-        run: dotnet pack Bdcf.Extensions.sln --configuration Release --no-build --output ./nupkg /p:Version=${{ steps.clean_version.outputs.clean_version }}
+        shell: pwsh
+        run: |
+          $version = '${{ steps.clean_version.outputs.clean_version }}'
+          $packArgs = @(
+            '--configuration', 'Release',
+            '--no-build',
+            '--output', './nupkg',
+            '-warnaserror',
+            "/p:Version=$version",
+            '/p:ContinuousIntegrationBuild=true',
+            '/p:TreatWarningsAsErrors=true'
+          )
+
+          dotnet pack src/Bdcf.Extensions/Bdcf.Extensions.csproj @packArgs
+          dotnet pack src/Bdcf.Extensions.Web/Bdcf.Extensions.Web.csproj @packArgs
+          dotnet pack src/Bdcf.Extensions.DacPac/Bdcf.Extensions.DacPac.csproj @packArgs
         
       - name: Publish
-        shell: cmd
-        run: dotnet nuget push nupkg\*.nupkg --source "https://nuget.pkg.github.com/bdemarzo/index.json" --api-key ${{ secrets.NUGET_TOKEN }}
+        shell: pwsh
+        run: dotnet nuget push "nupkg/*.nupkg" --source "https://nuget.pkg.github.com/bdemarzo/index.json" --api-key ${{ secrets.NUGET_TOKEN }} --skip-duplicate
 
       - name: Release
         uses: softprops/action-gh-release@v2

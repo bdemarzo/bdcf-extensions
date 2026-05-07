@@ -22,8 +22,10 @@ EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Config", "Config", "{2A64C51E-96C6-49E4-B92B-3FB2F4648487}"
 	ProjectSection(SolutionItems) = preProject
 		.editorconfig = .editorconfig
+		CHANGELOG.md = CHANGELOG.md
 		Directory.Build.props = Directory.Build.props
 		Directory.Packages.props = Directory.Packages.props
+		LICENSE = LICENSE
 		NuGet.config = NuGet.config
 	EndProjectSection
 EndProject

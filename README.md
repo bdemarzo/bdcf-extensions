@@ -33,3 +33,11 @@ SQL Server DACPAC deployment helpers:
 ## Repository
 
 Source code is available at https://github.com/bdemarzo/bdcf-extensions.
+
+## License
+
+This project is licensed under the MIT License. See `LICENSE` for details.
+
+## Releases
+
+Releases are created from semantic version tags such as `v1.2.3`. See `CHANGELOG.md` for release history and the release policy.

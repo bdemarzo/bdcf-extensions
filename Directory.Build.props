@@ -1,6 +1,7 @@
 <Project>
 	<PropertyGroup>
 		<ImplicitUsings>enable</ImplicitUsings>
+		<LangVersion>latest</LangVersion>
 		<Nullable>enable</Nullable>
 		<DebugType>portable</DebugType>
 		<Deterministic>true</Deterministic>
@@ -20,6 +21,8 @@
 		<NoWarn>$(NoWarn);1591</NoWarn>
 		<IncludeSymbols>true</IncludeSymbols>
 		<SymbolPackageFormat>snupkg</SymbolPackageFormat>
+		<EnablePackageValidation>true</EnablePackageValidation>
+		<PackageReleaseNotes>See CHANGELOG.md for release history and release policy.</PackageReleaseNotes>
 	</PropertyGroup>
 
 	<ItemGroup>
@@ -35,5 +38,6 @@
 
 	<ItemGroup>
 		<None Include="$(MSBuildThisFileDirectory)README.md" Pack="true" PackagePath="\" />
+		<None Include="$(MSBuildThisFileDirectory)CHANGELOG.md" Pack="true" PackagePath="\" Condition="Exists('$(MSBuildThisFileDirectory)CHANGELOG.md')" />
 	</ItemGroup>
 </Project>
