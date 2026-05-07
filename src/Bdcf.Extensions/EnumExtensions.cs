@@ -14,7 +14,7 @@ public static class EnumExtensions
 	public static string GetDisplayName(this Enum enumValue)
 	{
 		var stringValue = enumValue.ToString();
-		DisplayAttribute? displayAttribute = enumValue.GetType().GetMember(stringValue).First().GetCustomAttribute<DisplayAttribute>();
+		DisplayAttribute? displayAttribute = enumValue.GetType().GetMember(stringValue).FirstOrDefault()?.GetCustomAttribute<DisplayAttribute>();
 		string? displayName = displayAttribute?.GetName();
 
 		return displayName ?? stringValue;

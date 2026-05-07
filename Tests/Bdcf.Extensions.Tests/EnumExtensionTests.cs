@@ -11,6 +11,14 @@ public class EnumExtensionTests
 		HasDisplayName
 	}
 
+	[Flags]
+	private enum TestFlags
+	{
+		None = 0,
+		First = 1,
+		Second = 2
+	}
+
 	[Fact]
 	public void GetDisplayNameReturnsDisplayAttributeIfExists()
 	{
@@ -27,5 +35,21 @@ public class EnumExtensionTests
 		var expected = "NoDisplayName";
 
 		Assert.Equal(expected, value.GetDisplayName());
+	}
+
+	[Fact]
+	public void GetDisplayNameReturnsToStringForUndefinedEnumValue()
+	{
+		var value = (TestEnum)42;
+
+		Assert.Equal("42", value.GetDisplayName());
+	}
+
+	[Fact]
+	public void GetDisplayNameReturnsToStringForCombinedFlagValue()
+	{
+		var value = TestFlags.First | TestFlags.Second;
+
+		Assert.Equal("First, Second", value.GetDisplayName());
 	}
 }
