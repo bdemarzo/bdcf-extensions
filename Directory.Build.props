@@ -23,6 +23,11 @@
 		<SymbolPackageFormat>snupkg</SymbolPackageFormat>
 		<EnablePackageValidation>true</EnablePackageValidation>
 		<PackageReleaseNotes>See CHANGELOG.md for release history and release policy.</PackageReleaseNotes>
+		<IsTestingPlatformApplication>false</IsTestingPlatformApplication>
+	</PropertyGroup>
+
+	<PropertyGroup Condition="'$(IsTestProject)' == 'true'">
+		<OutputType>Exe</OutputType>
 	</PropertyGroup>
 
 	<ItemGroup>
