@@ -399,3 +399,9 @@ FodyWeavers.xsd
 
 # JetBrains Rider
 *.sln.iml
+
+# AI folders
+.github/skills
+.github/copilot-instructions.md
+.codex/skills
+.agents/skills

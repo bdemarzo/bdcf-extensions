@@ -10,6 +10,11 @@ public class ClaimsPrincipalExtensionsTests
 		return new ClaimsPrincipal(new ClaimsIdentity(claims));
 	}
 
+	private static ClaimsIdentity GetIdentity(ClaimsPrincipal principal)
+	{
+		return Assert.IsType<ClaimsIdentity>(principal.Identity);
+	}
+
 	[Theory]
 	[InlineData("123", 123)]
 	[InlineData("true", true)]
@@ -93,5 +98,81 @@ public class ClaimsPrincipalExtensionsTests
 
 		var exception = Assert.Throws<SecurityException>(() => principal.GetRequiredClaim<int?>("bad_nullable_claim"));
 		Assert.Contains("Required claim bad_nullable_claim could not be converted to Int32.", exception.Message);
+	}
+
+	[Fact]
+	public void SetClaim_ShouldReplaceExistingClaimValue()
+	{
+		var principal = CreatePrincipalWithClaims(new Claim("role", "user"));
+
+		principal.SetClaim("role", "admin");
+
+		var identity = GetIdentity(principal);
+		var roleClaims = identity.FindAll("role").ToList();
+		Assert.Single(roleClaims);
+		Assert.Equal("admin", roleClaims[0].Value);
+	}
+
+	[Fact]
+	public void SetClaim_ShouldAddClaim_WhenMissing()
+	{
+		var principal = CreatePrincipalWithClaims();
+
+		principal.SetClaim("team", "blue");
+
+		Assert.Equal("blue", principal.FindFirst("team")?.Value);
+	}
+
+	[Fact]
+	public void SetClaim_ShouldUseEmptyString_WhenValueIsNull()
+	{
+		var principal = CreatePrincipalWithClaims();
+
+		principal.SetClaim("note", null!);
+
+		Assert.Equal(string.Empty, principal.FindFirst("note")?.Value);
+	}
+
+	[Fact]
+	public void AddClaim_ShouldAddClaim_WhenMissing()
+	{
+		var principal = CreatePrincipalWithClaims();
+
+		principal.AddClaim("role", "user");
+
+		Assert.Equal("user", principal.FindFirst("role")?.Value);
+	}
+
+	[Fact]
+	public void AddClaim_ShouldNotDuplicateExistingClaim()
+	{
+		var principal = CreatePrincipalWithClaims(new Claim("role", "user"));
+
+		principal.AddClaim("role", "admin");
+
+		var identity = GetIdentity(principal);
+		var roleClaims = identity.FindAll("role").ToList();
+		Assert.Single(roleClaims);
+		Assert.Equal("user", roleClaims[0].Value);
+	}
+
+	[Fact]
+	public void RemoveClaim_ShouldRemoveExistingClaim()
+	{
+		var principal = CreatePrincipalWithClaims(new Claim("role", "user"));
+
+		principal.RemoveClaim("role");
+
+		Assert.Null(principal.FindFirst("role"));
+	}
+
+	[Fact]
+	public void RemoveClaim_ShouldNoOp_WhenClaimDoesNotExist()
+	{
+		var principal = CreatePrincipalWithClaims(new Claim("role", "user"));
+
+		principal.RemoveClaim("missing");
+
+		Assert.Equal("user", principal.FindFirst("role")?.Value);
 	}
 }

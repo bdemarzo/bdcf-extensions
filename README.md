@@ -2,6 +2,11 @@
 
 Reusable .NET extension libraries used by BDCF applications.
 
+## Framework Support
+
+- .NET 8 and newer
+- .NET Standard 2.0 is no longer supported
+
 ## Packages
 
 ### Bdcf.Extensions

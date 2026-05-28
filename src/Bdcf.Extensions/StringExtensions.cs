@@ -1,4 +1,4 @@
-﻿namespace Bdcf.Extensions;
+namespace Bdcf.Extensions;
 
 public static class StringExtensions
 {
@@ -11,9 +11,12 @@ public static class StringExtensions
 	/// <returns>The shortened string.</returns>
 	public static string Left(this string s, int length)
 	{
+		ArgumentNullException.ThrowIfNull(s);
+		ArgumentOutOfRangeException.ThrowIfNegative(length);
+
 		if (s.Length > length)
 		{
-			return s.Substring(0, length);
+			return s[..length];
 		}
 		else
 		{

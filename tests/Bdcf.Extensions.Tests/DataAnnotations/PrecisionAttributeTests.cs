@@ -10,6 +10,12 @@ public class PrecisionAttributeTests
 		public decimal Value { get; set; }
 	}
 
+	private class NullableDecimalTestModel
+	{
+		[Precision(DecimalPlaces = 2)]
+		public decimal? Value { get; set; }
+	}
+
 	private class TimeSpanTestModel
 	{
 		[Precision(TimeSpanPrecision = TimeSpanPrecision.Minutes)]
@@ -22,7 +28,6 @@ public class PrecisionAttributeTests
 	[InlineData(10.555, 10.55, 2)]
 	[InlineData(50.6789, 50.678, 3)]
 	[InlineData(100, 100, 2)]
-	[InlineData(null, null, 2)]
 	public void ValidationShouldTruncateDecimalPlaces(object? input, object? expected, int decimalPlaces)
 	{
 		decimal? inputValue = input as decimal?;
@@ -36,6 +41,32 @@ public class PrecisionAttributeTests
 
 		Assert.Equal(ValidationResult.Success, result);
 		Assert.Equal(expectedValue ?? 0m, model.Value);
+	}
+
+	[Fact]
+	public void ValidationShouldPreserveNullForNullableDecimal()
+	{
+		var attribute = new PrecisionAttribute { DecimalPlaces = 2 };
+		var model = new NullableDecimalTestModel { Value = null };
+		var context = new ValidationContext(model) { MemberName = nameof(model.Value) };
+
+		var result = attribute.GetValidationResult(model.Value, context);
+
+		Assert.Equal(ValidationResult.Success, result);
+		Assert.Null(model.Value);
+	}
+
+	[Fact]
+	public void ValidationShouldTruncateNullableDecimalWhenValuePresent()
+	{
+		var attribute = new PrecisionAttribute { DecimalPlaces = 2 };
+		var model = new NullableDecimalTestModel { Value = 123.4567m };
+		var context = new ValidationContext(model) { MemberName = nameof(model.Value) };
+
+		var result = attribute.GetValidationResult(model.Value, context);
+
+		Assert.Equal(ValidationResult.Success, result);
+		Assert.Equal(123.45m, model.Value);
 	}
 
 	[Theory]
