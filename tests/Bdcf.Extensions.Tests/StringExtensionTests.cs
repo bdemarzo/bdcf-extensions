@@ -21,4 +21,37 @@ public class StringExtensionTests
 
 		Assert.Equal(expected, s.Left(length));
 	}
+
+	[Fact]
+	public void LeftReturnsOriginalStringIfLengthEqualsStringLength()
+	{
+		string s = "123456789";
+		int length = s.Length;
+
+		Assert.Equal(s, s.Left(length));
+	}
+
+	[Fact]
+	public void LeftReturnsEmptyStringIfLengthIsZero()
+	{
+		string s = "123456789";
+
+		Assert.Equal(string.Empty, s.Left(0));
+	}
+
+	[Fact]
+	public void LeftThrowsArgumentOutOfRangeExceptionIfLengthIsNegative()
+	{
+		string s = "123456789";
+
+		Assert.Throws<ArgumentOutOfRangeException>(() => s.Left(-1));
+	}
+
+	[Fact]
+	public void LeftThrowsArgumentNullExceptionIfStringIsNull()
+	{
+		string? s = null;
+
+		Assert.Throws<ArgumentNullException>(() => s!.Left(1));
+	}
 }

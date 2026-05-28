@@ -21,7 +21,7 @@ public class TypeExtensionTests
 		var derivedType = new Grandchild();
 		var baseType = new Parent();
 
-		Assert.False(derivedType.GetType().IsDirectDescendantOf(derivedType.GetType()));
+		Assert.False(derivedType.GetType().IsDirectDescendantOf(baseType.GetType()));
 	}
 
 	[Fact]
@@ -30,6 +30,6 @@ public class TypeExtensionTests
 		var derivedType = new object();
 		var baseType = new Parent();
 
-		Assert.False(derivedType.GetType().IsDirectDescendantOf(derivedType.GetType()));
+		Assert.False(derivedType.GetType().IsDirectDescendantOf(baseType.GetType()));
 	}
 }
