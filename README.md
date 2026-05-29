@@ -35,6 +35,14 @@ SQL Server DACPAC deployment helpers:
 - configure deployment through options
 - apply a DACPAC at host startup
 
+## Documentation
+
+Detailed documentation for each library is available in the [`/docs`](./docs/) folder:
+
+- [Bdcf.Extensions](./docs/BDCF_EXTENSIONS.md)
+- [Bdcf.Extensions.Web](./docs/BDCF_EXTENSIONS_WEB.md)
+- [Bdcf.Extensions.DacPac](./docs/BDCF_EXTENSIONS_DACPAC.md)
+
 ## Repository
 
 Source code is available at https://github.com/bdemarzo/bdcf-extensions.

@@ -7,6 +7,11 @@
 	</PropertyGroup>
 
 	<ItemGroup>
+	  <None Remove="C:\git\bdcf\bdcf-extensions\CHANGELOG.md" />
+	  <None Remove="C:\git\bdcf\bdcf-extensions\README.md" />
+	</ItemGroup>
+
+	<ItemGroup>
 		<PackageReference Include="Microsoft.Data.SqlClient" />
 		<PackageReference Include="Microsoft.Extensions.Configuration.Abstractions" />
 		<PackageReference Include="Microsoft.Extensions.Hosting.Abstractions" />
