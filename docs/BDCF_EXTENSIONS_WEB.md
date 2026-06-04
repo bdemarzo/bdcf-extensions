@@ -2,6 +2,23 @@
 
 ASP.NET Core enhancements and extensions for MVC/Razor applications, with first-class support for HTMX.
 
+## Table of Contents
+
+- [Overview](#overview)
+- [Key Features](#key-features)
+  - [HTTP Request Helpers](#http-request-helpers)
+  - [HTTP Response Helpers](#http-response-helpers)
+  - [Action Method Attributes](#action-method-attributes)
+  - [Action Results](#action-results)
+  - [Tag Helpers](#tag-helpers)
+  - [Model Binding](#model-binding)
+  - [TempData Extensions](#tempdata-extensions)
+  - [Route Transformation](#route-transformation)
+  - [HTML Helper Extensions](#html-helper-extensions)
+- [Installation](#installation)
+- [Requirements](#requirements)
+- [See Also](#see-also)
+
 ## Overview
 
 `Bdcf.Extensions.Web` provides utilities for building dynamic ASP.NET Core applications with request/response helpers, action filters, tag helpers, and model binding extensions.
@@ -151,6 +168,24 @@ public IActionResult Process(TimeSpan duration)
 }
 ```
 
+### TempData Extensions
+
+**`Put<T>(string key, T value)`** — Serialize an object and store it in `TempData`.
+
+```csharp
+TempData.Put("message", new AlertMessage
+{
+	Title = "Saved",
+	Body = "Your changes were saved."
+});
+```
+
+**`Get<T>(string key)`** — Deserialize an object from `TempData`, or return `null` when the key is missing.
+
+```csharp
+AlertMessage? message = TempData.Get<AlertMessage>("message");
+```
+
 ### Route Transformation
 
 **`KebabCaseOutboundParameterTransformer`** — Convert route parameter names to kebab-case in URLs.
@@ -167,7 +202,7 @@ public IActionResult MyActionMethod() { }
 // Generated URL: /api/controller/my-action-method
 ```
 
-### MVC Helpers
+### HTML Helper Extensions
 
 **`If(bool? condition)`** — Return the condition value, or `false` when the condition is `null`.
 
@@ -221,8 +256,6 @@ public IActionResult MyActionMethod() { }
 	<a asp-controller="Projects" asp-action="Index">Projects</a>
 </li>
 ```
-
-**`TempDataExtensions`** — Serialize/deserialize complex objects in TempData.
 
 ## Installation
 
