@@ -33,13 +33,13 @@ if (request.IsHtmx())
 **`ForceHtmxRefresh()`** — Send HTMX refresh command to client.
 
 ```csharp
-response.ForceHtmxRefresh();  // Client will refresh the page
+response.ForceHtmxRefresh();  // HTMX client will refresh the page
 ```
 
 **`ForceHtmxRedirect(string url)`** — Send HTMX redirect command.
 
 ```csharp
-response.ForceHtmxRedirect("/dashboard");  // Client navigates to URL
+response.ForceHtmxRedirect("/dashboard");  // HTMX client redirects to URL
 ```
 
 ### Action Method Attributes

@@ -26,7 +26,6 @@ public enum Status
 {
 	[Display(Name = "In Progress")]
 	InProgress,
-
 	Completed
 }
 
@@ -62,7 +61,7 @@ status.In(Status.Active, Status.Pending)  // true if status matches either
 role.NotIn(Role.Admin, Role.SuperAdmin)  // true if role matches neither
 ```
 
-**`Between<T>(T start, T end)`** — Check if a value is between two values (inclusive).
+**`Between<T>(T start, T end)`** — Check if a value is between two values (inclusive). `T` must implement `IComparable<T>`.
 
 ```csharp
 5.Between(1, 10)      // true
@@ -92,6 +91,42 @@ public class Order
 }
 
 // ValidationContext will truncate Total to 2 decimal places and Duration to hours precision
+```
+
+### Security Extensions
+
+Helpers for reading and updating claims on a `ClaimsPrincipal`.
+
+**`GetClaim<T>(string claimType)`** — Get the first matching claim value and convert it to the requested type. Returns the default value when the claim is missing or cannot be converted.
+
+```csharp
+int? userId = User.GetClaim<int>("user_id");
+string? email = User.GetClaim(ClaimTypes.Email);
+```
+
+**`GetRequiredClaim<T>(string claimType)`** — Get the first matching claim value and convert it to the requested type. Throws `SecurityException` when the claim is missing or cannot be converted.
+
+```csharp
+int userId = User.GetRequiredClaim<int>("user_id");
+string email = User.GetRequiredClaim(ClaimTypes.Email);
+```
+
+**`SetClaim(string claimType, object value)`** — Add or replace a claim value on the principal's `ClaimsIdentity`.
+
+```csharp
+User.SetClaim("tenant_id", tenantId);
+```
+
+**`AddClaim(string claimType, object value)`** — Add a claim value only when the claim type is not already present.
+
+```csharp
+User.AddClaim("feature", "advanced-reports");
+```
+
+**`RemoveClaim(string claimType)`** — Remove the first matching claim from the principal's `ClaimsIdentity`.
+
+```csharp
+User.RemoveClaim("temporary_access");
 ```
 
 ## Installation
