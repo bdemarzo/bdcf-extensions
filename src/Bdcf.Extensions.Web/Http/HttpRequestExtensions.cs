@@ -26,7 +26,7 @@ public static class HttpRequestExtensions
 	/// </summary>
 	/// <param name="request">The HTTP request.</param>
 	/// <returns>true if the specified HTTP request is an HTMX request; otherwise, false.</returns>
-	public static bool IsHtmxRequest(this HttpRequest request)
+	public static bool IsHtmx(this HttpRequest request)
 	{
 		if (request.Headers is null)
 		{
@@ -34,5 +34,17 @@ public static class HttpRequestExtensions
 		}
 
 		return string.Equals(request.Headers["HX-Request"], "true", StringComparison.OrdinalIgnoreCase);
+	}
+
+	/// <summary>
+	/// Determines whether the specified HTTP request is an HTMX request.
+	/// OBSOLETE -- use IsHtmx instead.
+	/// </summary>
+	/// <param name="request">The HTTP request.</param>
+	/// <returns>true if the specified HTTP request is an HTMX request; otherwise, false.</returns>
+	[Obsolete("Use IsHtmx instead.")]
+	public static bool IsHxRequest(this HttpRequest request)
+	{
+		return IsHtmx(request);
 	}
 }
