@@ -147,6 +147,12 @@ public IActionResult Create(ProjectForm form)
 
 **`Html5ValidationTagHelper`** — Add HTML5 validation attributes based on data annotations.
 
+Enable the tag helper in `_ViewImports.cshtml`:
+
+```cshtml
+@addTagHelper *, Bdcf.Extensions.Web
+```
+
 ```html
 <!-- Automatically renders data-val, data-val-required, etc. -->
 <input asp-for="Email" />
