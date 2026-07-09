@@ -17,6 +17,22 @@ General-purpose helper methods for common .NET tasks.
 "Hi".Left(10)          // "Hi"
 ```
 
+**`TrimToNull()`** — Trim a nullable string and return `null` when the trimmed result is empty.
+
+```csharp
+"  Hello  ".TrimToNull()  // "Hello"
+"   ".TrimToNull()        // null
+((string?)null).TrimToNull()  // null
+```
+
+**`TrimToEmpty()`** — Trim a nullable string and return an empty string when the value is `null`.
+
+```csharp
+"  Hello  ".TrimToEmpty()  // "Hello"
+"   ".TrimToEmpty()        // ""
+((string?)null).TrimToEmpty()  // ""
+```
+
 ### Enum Extensions
 
 **`GetDisplayName()`** — Get the display name from a `DisplayAttribute`, or the enum name as fallback.
