@@ -145,6 +145,25 @@ public IActionResult Create(ProjectForm form)
 </nav>
 ```
 
+**`asp-active-route-class`** — Add a CSS class to an anchor when the current route matches its `asp-area`, `asp-controller`, and `asp-action`.
+
+Enable the tag helper in `_ViewImports.cshtml`:
+
+```cshtml
+@addTagHelper *, Bdcf.Extensions.Web
+```
+
+```html
+<a class="nav-link"
+   asp-controller="Songs"
+   asp-action="Index"
+   asp-active-route-class="active">
+	Songs
+</a>
+```
+
+When active, the helper adds the supplied class and `aria-current="page"`. A minimized or blank `asp-active-route-class` value is ignored.
+
 **`Html5ValidationTagHelper`** — Add HTML5 validation attributes based on data annotations.
 
 Enable the tag helper in `_ViewImports.cshtml`:
