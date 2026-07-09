@@ -2,41 +2,14 @@
 
 public class StringExtensionTests
 {
-	[Fact]
-	public void LeftReturnsTruncatedStringIfStringLongerThanLength()
+	[Theory]
+	[InlineData("123456789", 3, "123")]
+	[InlineData("123456789", 10, "123456789")]
+	[InlineData("123456789", 9, "123456789")]
+	[InlineData("123456789", 0, "")]
+	public void LeftReturnsExpectedValue(string value, int length, string expected)
 	{
-		string s = "123456789";
-		int length = 3;
-		string expected = "123";
-
-		Assert.Equal(expected, s.Left(length));
-	}
-
-	[Fact]
-	public void LeftReturnsOriginalStringIfStringNotLongerThanLength()
-	{
-		string s = "123456789";
-		int length = 10;
-		string expected = "123456789";
-
-		Assert.Equal(expected, s.Left(length));
-	}
-
-	[Fact]
-	public void LeftReturnsOriginalStringIfLengthEqualsStringLength()
-	{
-		string s = "123456789";
-		int length = s.Length;
-
-		Assert.Equal(s, s.Left(length));
-	}
-
-	[Fact]
-	public void LeftReturnsEmptyStringIfLengthIsZero()
-	{
-		string s = "123456789";
-
-		Assert.Equal(string.Empty, s.Left(0));
+		Assert.Equal(expected, value.Left(length));
 	}
 
 	[Fact]
@@ -53,5 +26,29 @@ public class StringExtensionTests
 		string? s = null;
 
 		Assert.Throws<ArgumentNullException>(() => s!.Left(1));
+	}
+
+	[Theory]
+	[InlineData(null, null)]
+	[InlineData("", null)]
+	[InlineData("   ", null)]
+	[InlineData("value", "value")]
+	[InlineData("  value  ", "value")]
+	[InlineData("\tvalue\r\n", "value")]
+	public void TrimToNullReturnsExpectedValue(string? value, string? expected)
+	{
+		Assert.Equal(expected, value.TrimToNull());
+	}
+
+	[Theory]
+	[InlineData(null, "")]
+	[InlineData("", "")]
+	[InlineData("   ", "")]
+	[InlineData("value", "value")]
+	[InlineData("  value  ", "value")]
+	[InlineData("\tvalue\r\n", "value")]
+	public void TrimToEmptyReturnsExpectedValue(string? value, string expected)
+	{
+		Assert.Equal(expected, value.TrimToEmpty());
 	}
 }
