@@ -219,19 +219,51 @@ AlertMessage? message = TempData.Get<AlertMessage>("message");
 
 ### Route Transformation
 
-**`KebabCaseOutboundParameterTransformer`** — Convert route parameter names to kebab-case in URLs.
+**`KebabCaseOutboundParameterTransformer`** — Convert controller and action route values to kebab-case in URLs.
+
+For attribute routes, register the MVC convention once:
 
 ```csharp
 // Configure in Program.cs
+using Bdcf.Extensions.Web;
+
 builder.Services.AddControllersWithViews()
 	.AddKebabCaseRouting();
 
-// Usage in route
+// Attribute route tokens are transformed
 [Route("api/[controller]/[action]")]
-public IActionResult MyActionMethod() { }
+public class SubscriptionManagementController : Controller
+{
+	[HttpGet]
+	public IActionResult GetAll() => View();
+}
 
-// Generated URL: /api/controller/my-action-method
+// Generated URL: /api/subscription-management/get-all
 ```
+
+For conventional MVC routing, register the same MVC convention and map the opt-in kebab-case route:
+
+```csharp
+using Bdcf.Extensions.Web;
+using Bdcf.Extensions.Web.Routing;
+
+builder.Services.AddControllersWithViews()
+	.AddKebabCaseRouting();
+
+var app = builder.Build();
+app.MapKebabCaseControllerRoute();
+
+// SubscriptionManagementController.GetAll
+// Generated and matched URL: /subscription-management/get-all
+```
+
+The conventional route is equivalent to:
+
+```text
+{controller:kebab=Home}/{action:kebab=Index}/{id?}
+```
+
+The transformer applies to route parameters only. Explicit literal route segments are not rewritten, so literals should already be lowercase kebab-case. Query-string values are also left unchanged.
 
 ### Legacy HTML Helper Extensions
 

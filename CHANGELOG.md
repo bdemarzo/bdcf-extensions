@@ -16,6 +16,7 @@ This project follows tag-based releases. Create releases from tags named `vMAJOR
 
 ## Unreleased
 
+- Added opt-in kebab-case conventional MVC routing alongside the existing attribute-route token transformation. This is a backward-compatible minor-version feature.
 - Improved NuGet package metadata, package readme content, SourceLink, XML documentation, symbol packages, and package validation.
 - Moved package projects under `src/` and test projects under `tests/`.
 - Split DACPAC LocalDB tests into a dedicated integration test project.
