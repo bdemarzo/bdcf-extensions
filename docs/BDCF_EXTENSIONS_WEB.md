@@ -14,7 +14,7 @@ ASP.NET Core enhancements and extensions for MVC/Razor applications, with first-
   - [Model Binding](#model-binding)
   - [TempData Extensions](#tempdata-extensions)
   - [Route Transformation](#route-transformation)
-  - [HTML Helper Extensions](#html-helper-extensions)
+  - [Legacy HTML Helper Extensions](#legacy-html-helper-extensions)
 - [Installation](#installation)
 - [Requirements](#requirements)
 - [See Also](#see-also)
@@ -131,6 +131,12 @@ public IActionResult Create(ProjectForm form)
 
 ### Tag Helpers
 
+Enable the tag helpers in `_ViewImports.cshtml`:
+
+```cshtml
+@addTagHelper *, Bdcf.Extensions.Web
+```
+
 **`include-if`/`exclude-if`** — Conditionally render elements in Razor views.
 
 ```html
@@ -227,60 +233,20 @@ public IActionResult MyActionMethod() { }
 // Generated URL: /api/controller/my-action-method
 ```
 
-### HTML Helper Extensions
+### Legacy HTML Helper Extensions
 
-**`If(bool? condition)`** — Return the condition value, or `false` when the condition is `null`.
+The boolean-returning `Html.*` extensions are retained for compatibility and are obsolete. They do not generate HTML; use the Tag Helpers above or standard Razor expressions instead.
 
-```cshtml
-@if (Html.If(Model.ShowDetails))
-{
-	<section>Details</section>
-}
-```
+| Legacy API | Preferred replacement |
+| --- | --- |
+| `Html.If(condition)` | `include-if="@condition"` or a standard Razor `@if` |
+| `Html.IfNot(condition)` | `exclude-if="@condition"` |
+| `Html.IfHasValue(value)` | `include-if="@(value is not null)"` |
+| `Html.IfHasValue(text)` | `include-if="@(!string.IsNullOrWhiteSpace(text))"` |
+| `Html.IfNull(value)` | `include-if="@(value is null)"` |
+| `Html.IfActive(action, controller)` | `asp-active-route-class="active"` |
 
-**`IfNot(bool condition)`** — Return the inverse of a condition.
-
-```cshtml
-@if (Html.IfNot(User.Identity?.IsAuthenticated ?? false))
-{
-	<a asp-controller="Account" asp-action="Login">Sign in</a>
-}
-```
-
-**`IfHasValue(object obj)`** — Return `true` when an object is not `null`.
-
-```cshtml
-@if (Html.IfHasValue(Model.Customer))
-{
-	<p>@Model.Customer.Name</p>
-}
-```
-
-**`IfHasValue(string? str)`** — Return `true` when a string is not null, empty, or whitespace.
-
-```cshtml
-@if (Html.IfHasValue(Model.Description))
-{
-	<p>@Model.Description</p>
-}
-```
-
-**`IfNull(object? obj)`** — Return `true` when an object is `null`.
-
-```cshtml
-@if (Html.IfNull(Model.Customer))
-{
-	<p>No customer selected.</p>
-}
-```
-
-**`IfActive(string action, string controller)`** — Return `true` when the current route matches the specified controller and action. The `Details` action also matches the specified action for the same controller.
-
-```cshtml
-<li class="@(Html.IfActive("Index", "Projects") ? "active" : "")">
-	<a asp-controller="Projects" asp-action="Index">Projects</a>
-</li>
-```
+Active-route matching uses an exact controller, action, and area match.
 
 ## Installation
 

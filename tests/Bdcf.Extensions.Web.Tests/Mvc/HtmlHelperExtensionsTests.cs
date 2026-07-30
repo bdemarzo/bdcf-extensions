@@ -4,6 +4,8 @@ using Moq;
 
 namespace Bdcf.Extensions.Web.Mvc.Tests;
 
+#pragma warning disable CS0618 // These tests cover the obsolete compatibility API.
+
 public class HtmlHelperExtensionsTests
 {
 	private readonly IHtmlHelper _htmlHelper = Mock.Of<IHtmlHelper>();
@@ -67,10 +69,10 @@ public class HtmlHelperExtensionsTests
 
 	[Theory]
 	[InlineData("Index", "Home", "Index", "Home", true)]
-	[InlineData("Edit", "Product", "Details", "Product", true)]
+	[InlineData("Edit", "Product", "Details", "Product", false)]
 	[InlineData("Create", "Product", "Edit", "Product", false)]
 	[InlineData("Index", "Account", "Index", "Home", false)]
-	public void IfActive_ReturnsExpectedResult(string targetAction, string targetController, string currentAction, string currentController, bool expected)
+	public void IfActive_ReturnsExactRouteMatch(string targetAction, string targetController, string currentAction, string currentController, bool expected)
 	{
 		var routeData = new RouteData();
 		routeData.Values["action"] = currentAction;
@@ -89,3 +91,5 @@ public class HtmlHelperExtensionsTests
 		Assert.Equal(expected, result);
 	}
 }
+
+#pragma warning restore CS0618

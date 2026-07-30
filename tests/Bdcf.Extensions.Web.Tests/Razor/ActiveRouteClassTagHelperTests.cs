@@ -80,6 +80,22 @@ public class ActiveRouteClassTagHelperTests
 	}
 
 	[Fact]
+	public void Process_DoesNotAddActiveClass_WhenActionDoesNotMatch()
+	{
+		var tagHelper = CreateTagHelper(controller: "Products", action: "Details");
+		var context = CreateContext(
+			new TagHelperAttribute("asp-controller", "Products"),
+			new TagHelperAttribute("asp-action", "Edit"),
+			new TagHelperAttribute(ActiveRouteClassTagHelper.ACTIVE_ROUTE_CLASS, "active"));
+		var output = CreateOutput(context);
+
+		tagHelper.Process(context, output);
+
+		Assert.Equal("nav-link", output.Attributes["class"].Value);
+		Assert.Null(output.Attributes["aria-current"]);
+	}
+
+	[Fact]
 	public void Process_AddsActiveClass_WhenAreaMatches()
 	{
 		var tagHelper = CreateTagHelper(controller: "Songs", action: "Index", area: "Admin");
