@@ -8,6 +8,7 @@ public class KebabCaseOutboundParameterTransformerTests
 	[InlineData("TimeCard", "time-card")]
 	[InlineData("HTMLParser", "html-parser")]
 	[InlineData("MyAPIEndpoint", "my-api-endpoint")]
+	[InlineData("Version2Update", "version2-update")]
 	[InlineData("With/SlashValue", "with/slash-value")]
 	[InlineData("Already-Kebab", "already-kebab")]
 	[InlineData("snake_case", "snake_case")]

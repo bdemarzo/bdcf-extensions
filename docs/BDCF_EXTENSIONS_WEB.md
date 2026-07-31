@@ -14,7 +14,7 @@ ASP.NET Core enhancements and extensions for MVC/Razor applications, with first-
   - [Model Binding](#model-binding)
   - [TempData Extensions](#tempdata-extensions)
   - [Route Transformation](#route-transformation)
-  - [HTML Helper Extensions](#html-helper-extensions)
+  - [Legacy HTML Helper Extensions](#legacy-html-helper-extensions)
 - [Installation](#installation)
 - [Requirements](#requirements)
 - [See Also](#see-also)
@@ -131,6 +131,12 @@ public IActionResult Create(ProjectForm form)
 
 ### Tag Helpers
 
+Enable the tag helpers in `_ViewImports.cshtml`:
+
+```cshtml
+@addTagHelper *, Bdcf.Extensions.Web
+```
+
 **`include-if`/`exclude-if`** — Conditionally render elements in Razor views.
 
 ```html
@@ -144,6 +150,25 @@ public IActionResult Create(ProjectForm form)
 	Login / Sign Up
 </nav>
 ```
+
+**`asp-active-route-class`** — Add a CSS class to an anchor when the current route matches its `asp-area`, `asp-controller`, and `asp-action`.
+
+Enable the tag helper in `_ViewImports.cshtml`:
+
+```cshtml
+@addTagHelper *, Bdcf.Extensions.Web
+```
+
+```html
+<a class="nav-link"
+   asp-controller="Songs"
+   asp-action="Index"
+   asp-active-route-class="active">
+	Songs
+</a>
+```
+
+When active, the helper adds the supplied class and `aria-current="page"`. A minimized or blank `asp-active-route-class` value is ignored.
 
 **`Html5ValidationTagHelper`** — Add HTML5 validation attributes based on data annotations.
 
@@ -194,74 +219,66 @@ AlertMessage? message = TempData.Get<AlertMessage>("message");
 
 ### Route Transformation
 
-**`KebabCaseOutboundParameterTransformer`** — Convert route parameter names to kebab-case in URLs.
+**`KebabCaseOutboundParameterTransformer`** — Convert controller and action route values to kebab-case in URLs.
+
+For attribute routes, register the MVC convention once:
 
 ```csharp
 // Configure in Program.cs
+using Bdcf.Extensions.Web;
+
 builder.Services.AddControllersWithViews()
 	.AddKebabCaseRouting();
 
-// Usage in route
+// Attribute route tokens are transformed
 [Route("api/[controller]/[action]")]
-public IActionResult MyActionMethod() { }
-
-// Generated URL: /api/controller/my-action-method
-```
-
-### HTML Helper Extensions
-
-**`If(bool? condition)`** — Return the condition value, or `false` when the condition is `null`.
-
-```cshtml
-@if (Html.If(Model.ShowDetails))
+public class SubscriptionManagementController : Controller
 {
-	<section>Details</section>
+	[HttpGet]
+	public IActionResult GetAll() => View();
 }
+
+// Generated URL: /api/subscription-management/get-all
 ```
 
-**`IfNot(bool condition)`** — Return the inverse of a condition.
+For conventional MVC routing, register the same MVC convention and map the opt-in kebab-case route:
 
-```cshtml
-@if (Html.IfNot(User.Identity?.IsAuthenticated ?? false))
-{
-	<a asp-controller="Account" asp-action="Login">Sign in</a>
-}
+```csharp
+using Bdcf.Extensions.Web;
+using Bdcf.Extensions.Web.Routing;
+
+builder.Services.AddControllersWithViews()
+	.AddKebabCaseRouting();
+
+var app = builder.Build();
+app.MapKebabCaseControllerRoute();
+
+// SubscriptionManagementController.GetAll
+// Generated and matched URL: /subscription-management/get-all
 ```
 
-**`IfHasValue(object obj)`** — Return `true` when an object is not `null`.
+The conventional route is equivalent to:
 
-```cshtml
-@if (Html.IfHasValue(Model.Customer))
-{
-	<p>@Model.Customer.Name</p>
-}
+```text
+{controller:kebab=Home}/{action:kebab=Index}/{id?}
 ```
 
-**`IfHasValue(string? str)`** — Return `true` when a string is not null, empty, or whitespace.
+The transformer applies to route parameters only. Explicit literal route segments are not rewritten, so literals should already be lowercase kebab-case. Query-string values are also left unchanged.
 
-```cshtml
-@if (Html.IfHasValue(Model.Description))
-{
-	<p>@Model.Description</p>
-}
-```
+### Legacy HTML Helper Extensions
 
-**`IfNull(object? obj)`** — Return `true` when an object is `null`.
+The boolean-returning `Html.*` extensions are retained for compatibility and are obsolete. They do not generate HTML; use the Tag Helpers above or standard Razor expressions instead.
 
-```cshtml
-@if (Html.IfNull(Model.Customer))
-{
-	<p>No customer selected.</p>
-}
-```
+| Legacy API | Preferred replacement |
+| --- | --- |
+| `Html.If(condition)` | `include-if="@condition"` or a standard Razor `@if` |
+| `Html.IfNot(condition)` | `exclude-if="@condition"` |
+| `Html.IfHasValue(value)` | `include-if="@(value is not null)"` |
+| `Html.IfHasValue(text)` | `include-if="@(!string.IsNullOrWhiteSpace(text))"` |
+| `Html.IfNull(value)` | `include-if="@(value is null)"` |
+| `Html.IfActive(action, controller)` | `asp-active-route-class="active"` |
 
-**`IfActive(string action, string controller)`** — Return `true` when the current route matches the specified controller and action. The `Details` action also matches the specified action for the same controller.
-
-```cshtml
-<li class="@(Html.IfActive("Index", "Projects") ? "active" : "")">
-	<a asp-controller="Projects" asp-action="Index">Projects</a>
-</li>
-```
+Active-route matching uses an exact controller, action, and area match.
 
 ## Installation
 

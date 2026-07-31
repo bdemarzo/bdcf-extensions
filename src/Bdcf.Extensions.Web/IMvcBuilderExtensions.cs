@@ -2,6 +2,7 @@ using Bdcf.Extensions.Web.Mvc;
 using Bdcf.Extensions.Web.Routing;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.ApplicationModels;
+using Microsoft.AspNetCore.Routing;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace Bdcf.Extensions.Web;
@@ -18,6 +19,10 @@ public static class MvcBuilderExtensions
 		builder.Services.Configure<MvcOptions>(options =>
 		{
 			options.Conventions.Add(new RouteTokenTransformerConvention(new KebabCaseOutboundParameterTransformer()));
+		});
+		builder.Services.Configure<RouteOptions>(options =>
+		{
+			options.ConstraintMap["kebab"] = typeof(KebabCaseOutboundParameterTransformer);
 		});
 
 		return builder;
