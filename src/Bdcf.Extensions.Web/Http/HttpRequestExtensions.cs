@@ -18,7 +18,7 @@ public static class HttpRequestExtensions
 			return false;
 		}
 
-		return request.Headers.XRequestedWith == "XMLHttpRequest" || request.Headers["Hx-Request"] == "true";
+		return request.Headers.XRequestedWith == "XMLHttpRequest";
 	}
 
 	/// <summary>

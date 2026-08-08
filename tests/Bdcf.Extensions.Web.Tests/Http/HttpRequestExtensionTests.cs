@@ -18,7 +18,7 @@ public class HttpRequestExtensionsTests
 	}
 
 	[Fact]
-	public void IsAjax_ReturnsTrue_WhenHxRequestIsTrue()
+	public void IsAjax_ReturnsFalse_WhenHxRequestIsTrue()
 	{
 		var headers = new HeaderDictionary { { "Hx-Request", "true" } };
 		var mockRequest = new Mock<HttpRequest>();
@@ -26,7 +26,7 @@ public class HttpRequestExtensionsTests
 
 		var result = mockRequest.Object.IsAjax();
 
-		Assert.True(result);
+		Assert.False(result);
 	}
 
 	[Fact]

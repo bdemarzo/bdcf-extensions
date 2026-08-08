@@ -67,6 +67,25 @@ public class Html5ValidationTagHelperLogicTests
 		Assert.Equal("^[a-z]+$", attributes["pattern"]);
 	}
 
+	[Theory]
+	[InlineData(20, null, "20")]
+	[InlineData(null, 15, "15")]
+	[InlineData(20, 15, "15")]
+	public void AddsMaxLengthAttribute(int? stringLength, int? maxLength, string expected)
+	{
+		var validationAttributes = new List<object>();
+		if (stringLength.HasValue)
+			validationAttributes.Add(new StringLengthAttribute(stringLength.Value));
+		if (maxLength.HasValue)
+			validationAttributes.Add(new MaxLengthAttribute(maxLength.Value));
+
+		var metadata = CreateMetadata(typeof(string), [.. validationAttributes]);
+		var attributes = new Dictionary<string, string>();
+		Html5ValidationTagHelperLogic.ApplyValidationAttributes(metadata, null, attributes);
+
+		Assert.Equal(expected, attributes["maxlength"]);
+	}
+
 	[Fact]
 	public void AddsFirstPatternAttribute_WhenMultiplePatternAttributesExist()
 	{

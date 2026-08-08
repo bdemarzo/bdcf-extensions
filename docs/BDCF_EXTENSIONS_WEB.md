@@ -27,7 +27,8 @@ ASP.NET Core enhancements and extensions for MVC/Razor applications, with first-
 
 ### HTTP Request Helpers
 
-**`IsAjax()`** — Detect AJAX or XMLHttpRequest.
+**`IsAjax()`** — Detect XMLHttpRequest-style AJAX requests by checking for the
+`X-Requested-With: XMLHttpRequest` header. It does not identify HTMX requests.
 
 ```csharp
 if (request.IsAjax())
@@ -36,7 +37,8 @@ if (request.IsAjax())
 }
 ```
 
-**`IsHtmx()`** — Detect HTMX requests (checks for `HX-Request: true` header).
+**`IsHtmx()`** — Detect HTMX requests by checking for the `HX-Request: true` header.
+It does not identify XMLHttpRequest-style AJAX requests.
 
 ```csharp
 if (request.IsHtmx())
@@ -44,6 +46,8 @@ if (request.IsHtmx())
 	return Content("Updated content", "text/html");
 }
 ```
+
+**`IsHxRequest()`** — Obsolete alias for `IsHtmx()`. Use `request.IsHtmx()` in new code.
 
 ### HTTP Response Helpers
 
@@ -73,7 +77,8 @@ public IActionResult UpdatePartial(int id)
 }
 ```
 
-**`[AjaxOnly]`** — Restrict action to AJAX requests only.
+**`[AjaxOnly]`** — Restrict an action to XMLHttpRequest-style AJAX requests only.
+HTMX requests do not satisfy this attribute; use `[HtmxOnly]` for HTMX-only actions.
 
 ```csharp
 [HttpGet]
@@ -170,7 +175,9 @@ Enable the tag helper in `_ViewImports.cshtml`:
 
 When active, the helper adds the supplied class and `aria-current="page"`. A minimized or blank `asp-active-route-class` value is ignored.
 
-**`Html5ValidationTagHelper`** — Add HTML5 validation attributes based on data annotations.
+**`Html5ValidationTagHelper`** — Add native HTML5 validation attributes based on data annotations. Supported metadata
+includes `RequiredAttribute` (`required`), `StringLengthAttribute` and `MaxLengthAttribute` (`maxlength`),
+`RegularExpressionAttribute` (`pattern`), numeric `RangeAttribute` (`min`/`max`), and precision metadata (`step`).
 
 Enable the tag helper in `_ViewImports.cshtml`:
 
@@ -179,7 +186,7 @@ Enable the tag helper in `_ViewImports.cshtml`:
 ```
 
 ```html
-<!-- Automatically renders data-val, data-val-required, etc. -->
+<!-- Automatically renders native HTML5 attributes such as required, maxlength, and pattern. -->
 <input asp-for="Email" />
 ```
 

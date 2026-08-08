@@ -19,7 +19,7 @@ public class ActiveRouteClassTagHelperTests
 
 		tagHelper.Process(context, output);
 
-		Assert.Equal("nav-link active", output.Attributes["class"].Value);
+		Assert.Equal("nav-link active", output.Attributes["class"].Value?.ToString());
 		Assert.Equal("page", output.Attributes["aria-current"].Value);
 		Assert.Null(output.Attributes[ActiveRouteClassTagHelper.ACTIVE_ROUTE_CLASS]);
 	}
@@ -108,7 +108,7 @@ public class ActiveRouteClassTagHelperTests
 
 		tagHelper.Process(context, output);
 
-		Assert.Equal("nav-link active", output.Attributes["class"].Value);
+		Assert.Equal("nav-link active", output.Attributes["class"].Value?.ToString());
 		Assert.Equal("page", output.Attributes["aria-current"].Value);
 	}
 

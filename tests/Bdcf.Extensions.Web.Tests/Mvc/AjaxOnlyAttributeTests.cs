@@ -47,4 +47,23 @@ public class AjaxOnlyAttributeTests
 
 		Assert.False(result);
 	}
+
+	[Fact]
+	public void IsValidForRequest_ReturnsFalse_WhenRequestIsHtmx()
+	{
+		var headers = new HeaderDictionary { { "HX-Request", "true" } };
+		var mockRequest = new Mock<HttpRequest>();
+		mockRequest.Setup(r => r.Headers).Returns(headers);
+
+		var mockHttpContext = new Mock<HttpContext>();
+		mockHttpContext.Setup(c => c.Request).Returns(mockRequest.Object);
+
+		var routeContext = new RouteContext(mockHttpContext.Object);
+		var action = new ActionDescriptor();
+		var attribute = new AjaxOnlyAttribute();
+
+		var result = attribute.IsValidForRequest(routeContext, action);
+
+		Assert.False(result);
+	}
 }
