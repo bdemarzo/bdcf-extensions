@@ -49,6 +49,20 @@ Status.InProgress.GetDisplayName()  // "In Progress"
 Status.Completed.GetDisplayName()   // "Completed"
 ```
 
+**`GetDescription()`** — Get the description from a `DescriptionAttribute`, or the enum name as fallback.
+
+```csharp
+public enum Status
+{
+	[Description("Currently in progress")]
+	InProgress,
+	Completed
+}
+
+Status.InProgress.GetDescription()  // "Currently in progress"
+Status.Completed.GetDescription()   // "Completed"
+```
+
 ### Boolean Extensions
 
 **`Then(string output)`** — Return a string if condition is true, empty string otherwise.

@@ -8,7 +8,10 @@ public class EnumExtensionTests
 	{
 		NoDisplayName,
 		[Display(Name = "Has a display name")]
-		HasDisplayName
+		HasDisplayName,
+		NoDescription,
+		[System.ComponentModel.Description("Has a description")]
+		HasDescription
 	}
 
 	[Flags]
@@ -51,5 +54,23 @@ public class EnumExtensionTests
 		var value = TestFlags.First | TestFlags.Second;
 
 		Assert.Equal("First, Second", value.GetDisplayName());
+	}
+
+	[Fact]
+	public void GetDescriptionReturnsDescriptionAttributeIfExists()
+	{
+		Assert.Equal("Has a description", TestEnum.HasDescription.GetDescription());
+	}
+
+	[Fact]
+	public void GetDescriptionReturnsToStringIfNoDescriptionAttributeExists()
+	{
+		Assert.Equal("NoDescription", TestEnum.NoDescription.GetDescription());
+	}
+
+	[Fact]
+	public void GetDescriptionReturnsToStringForUndefinedEnumValue()
+	{
+		Assert.Equal("42", ((TestEnum)42).GetDescription());
 	}
 }
