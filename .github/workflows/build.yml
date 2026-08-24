@@ -23,7 +23,7 @@ jobs:
     - name: Setup .NET
       uses: actions/setup-dotnet@v4
       with:
-        dotnet-version: '8.x'
+        dotnet-version: '10.x'
 
     - name: Restore dependencies
       run: dotnet restore Bdcf.Extensions.sln
@@ -37,6 +37,7 @@ jobs:
         dotnet test tests/Bdcf.Extensions.Tests/Bdcf.Extensions.Tests.csproj --configuration Release --no-build
         dotnet test tests/Bdcf.Extensions.Web.Tests/Bdcf.Extensions.Web.Tests.csproj --configuration Release --no-build
         dotnet test tests/Bdcf.Extensions.DacPac.Tests/Bdcf.Extensions.DacPac.Tests.csproj --configuration Release --no-build
+        dotnet test tests/Bdcf.Extensions.Data.Tests/Bdcf.Extensions.Data.Tests.csproj --configuration Release --no-build
 
   integration-tests:
     name: Integration tests
@@ -49,7 +50,7 @@ jobs:
     - name: Setup .NET
       uses: actions/setup-dotnet@v4
       with:
-        dotnet-version: '8.x'
+        dotnet-version: '10.x'
 
     - name: Restore dependencies
       run: dotnet restore Bdcf.Extensions.sln

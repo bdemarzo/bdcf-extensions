@@ -7,7 +7,7 @@ This project follows tag-based releases. Create releases from tags named `vMAJOR
 ## Release Policy
 
 - Update this changelog before creating a release tag.
-- Keep package versions aligned across `Bdcf.Extensions`, `Bdcf.Extensions.Web`, and `Bdcf.Extensions.DacPac`.
+- Keep package versions aligned across `Bdcf.Extensions`, `Bdcf.Extensions.Web`, `Bdcf.Extensions.DacPac`, and `Bdcf.Extensions.Data`.
 - Use semantic versioning:
   - increment `MAJOR` for breaking public API or behavior changes
   - increment `MINOR` for backward-compatible features
@@ -17,6 +17,7 @@ This project follows tag-based releases. Create releases from tags named `vMAJOR
 ## Unreleased
 
 - Added opt-in kebab-case conventional MVC routing alongside the existing attribute-route token transformation. This is a backward-compatible minor-version feature.
+- Breaking: all packages and test projects now target .NET 10; .NET versions before 10 are no longer supported.
 - Improved NuGet package metadata, package readme content, SourceLink, XML documentation, symbol packages, and package validation.
 - Moved package projects under `src/` and test projects under `tests/`.
 - Split DACPAC LocalDB tests into a dedicated integration test project.

@@ -38,7 +38,7 @@ jobs:
       - name: Setup .NET
         uses: actions/setup-dotnet@v4
         with:
-          dotnet-version: '8.x'
+          dotnet-version: '10.x'
 
       - name: Restore dependencies
         run: dotnet restore Bdcf.Extensions.sln /p:ContinuousIntegrationBuild=true
@@ -52,6 +52,7 @@ jobs:
           dotnet test tests/Bdcf.Extensions.Tests/Bdcf.Extensions.Tests.csproj --configuration Release --no-build
           dotnet test tests/Bdcf.Extensions.Web.Tests/Bdcf.Extensions.Web.Tests.csproj --configuration Release --no-build
           dotnet test tests/Bdcf.Extensions.DacPac.Tests/Bdcf.Extensions.DacPac.Tests.csproj --configuration Release --no-build
+          dotnet test tests/Bdcf.Extensions.Data.Tests/Bdcf.Extensions.Data.Tests.csproj --configuration Release --no-build
 
       - name: Test integration projects
         run: dotnet test tests/Bdcf.Extensions.DacPac.IntegrationTests/Bdcf.Extensions.DacPac.IntegrationTests.csproj --configuration Release --no-build
@@ -73,6 +74,7 @@ jobs:
           dotnet pack src/Bdcf.Extensions/Bdcf.Extensions.csproj @packArgs
           dotnet pack src/Bdcf.Extensions.Web/Bdcf.Extensions.Web.csproj @packArgs
           dotnet pack src/Bdcf.Extensions.DacPac/Bdcf.Extensions.DacPac.csproj @packArgs
+          dotnet pack src/Bdcf.Extensions.Data/Bdcf.Extensions.Data.csproj @packArgs
         
       - name: Publish packages
         shell: pwsh

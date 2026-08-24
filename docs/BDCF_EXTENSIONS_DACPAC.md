@@ -190,7 +190,7 @@ dotnet add package Bdcf.Extensions.DacPac
 
 ## Requirements
 
-- .NET 8 or newer
+- .NET 10 or newer
 - SQL Server (local or remote)
 - DACPAC file embedded in your assembly
 

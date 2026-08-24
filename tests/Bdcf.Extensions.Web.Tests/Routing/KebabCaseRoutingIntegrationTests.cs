@@ -12,6 +12,7 @@ using Microsoft.AspNetCore.Razor.TagHelpers;
 using Microsoft.AspNetCore.Routing;
 using Microsoft.AspNetCore.TestHost;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Options;
 
 namespace Bdcf.Extensions.Web.Routing.Tests;
@@ -42,8 +43,8 @@ public class KebabCaseRoutingIntegrationTests
 	[Fact]
 	public async Task AttributeRouteTokens_AreTransformedAndExplicitLiteralsArePreserved()
 	{
-		using var server = CreateServer();
-		using var client = server.CreateClient();
+		using var host = CreateHost();
+		using var client = host.GetTestServer().CreateClient();
 
 		var transformedResponse = await client.GetAsync("/api/attribute-subscription-management/get-all", TestContext.Current.CancellationToken);
 		var literalResponse = await client.GetAsync("/ExplicitSegment/explicit-literal/get-all", TestContext.Current.CancellationToken);
@@ -57,8 +58,8 @@ public class KebabCaseRoutingIntegrationTests
 	[Fact]
 	public async Task ConventionalRoute_MatchesKebabCaseControllerAndAction()
 	{
-		using var server = CreateServer();
-		using var client = server.CreateClient();
+		using var host = CreateHost();
+		using var client = host.GetTestServer().CreateClient();
 
 		var response = await client.GetAsync("/subscription-management/get-all/42", TestContext.Current.CancellationToken);
 
@@ -69,8 +70,8 @@ public class KebabCaseRoutingIntegrationTests
 	[Fact]
 	public async Task ConventionalRoute_UsesDefaultsAndOptionalId()
 	{
-		using var server = CreateServer();
-		using var client = server.CreateClient();
+		using var host = CreateHost();
+		using var client = host.GetTestServer().CreateClient();
 
 		var defaultResponse = await client.GetAsync("/", TestContext.Current.CancellationToken);
 		var optionalIdResponse = await client.GetAsync("/subscription-management/get-all", TestContext.Current.CancellationToken);
@@ -84,8 +85,8 @@ public class KebabCaseRoutingIntegrationTests
 	[Fact]
 	public async Task ConventionalRoute_GeneratesLinksThroughUrlActionAndLinkGenerator()
 	{
-		using var server = CreateServer();
-		using var client = server.CreateClient();
+		using var host = CreateHost();
+		using var client = host.GetTestServer().CreateClient();
 
 		var response = await client.GetAsync("/link-generation/get-links", TestContext.Current.CancellationToken);
 		var links = (await response.Content.ReadAsStringAsync(TestContext.Current.CancellationToken)).Split('|');
@@ -98,8 +99,8 @@ public class KebabCaseRoutingIntegrationTests
 	[Fact]
 	public async Task ConventionalRoute_GeneratesLinksThroughMvcAnchorTagHelper()
 	{
-		using var server = CreateServer();
-		using var client = server.CreateClient();
+		using var host = CreateHost();
+		using var client = host.GetTestServer().CreateClient();
 
 		var response = await client.GetAsync("/link-generation/get-anchor", TestContext.Current.CancellationToken);
 
@@ -107,21 +108,30 @@ public class KebabCaseRoutingIntegrationTests
 		Assert.Equal("/subscription-management/get-all/17?filter=KeepCase", await response.Content.ReadAsStringAsync(TestContext.Current.CancellationToken));
 	}
 
-	private static TestServer CreateServer()
+	private static IHost CreateHost()
 	{
-		return new TestServer(new WebHostBuilder()
-			.ConfigureServices(services =>
+		var host = new HostBuilder()
+			.ConfigureWebHost(webHostBuilder =>
 			{
-				services.AddRouting();
-				services.AddControllersWithViews()
-					.AddApplicationPart(typeof(SubscriptionManagementController).Assembly)
-					.AddKebabCaseRouting();
+				webHostBuilder
+					.UseTestServer()
+					.ConfigureServices(services =>
+					{
+						services.AddRouting();
+						services.AddControllersWithViews()
+							.AddApplicationPart(typeof(SubscriptionManagementController).Assembly)
+							.AddKebabCaseRouting();
+					})
+					.Configure(app =>
+					{
+						app.UseRouting();
+						app.UseEndpoints(endpoints => endpoints.MapKebabCaseControllerRoute());
+					});
 			})
-			.Configure(app =>
-			{
-				app.UseRouting();
-				app.UseEndpoints(endpoints => endpoints.MapKebabCaseControllerRoute());
-			}));
+			.Build();
+
+		host.Start();
+		return host;
 	}
 
 }

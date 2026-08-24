@@ -8,21 +8,11 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <None Remove="Test.dacpac" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <EmbeddedResource Include="Test.dacpac" />
-  </ItemGroup>
-
-  <ItemGroup>
     <PackageReference Include="coverlet.collector">
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
-    <PackageReference Include="Microsoft.Data.SqlClient" />
-    <PackageReference Include="Microsoft.Extensions.Logging.Abstractions" />
-    <PackageReference Include="Microsoft.Extensions.Options" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" />
     <PackageReference Include="Microsoft.NET.Test.Sdk" />
     <PackageReference Include="xunit.v3" />
     <PackageReference Include="xunit.runner.visualstudio">
@@ -32,7 +22,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\..\src\Bdcf.Extensions.DacPac\Bdcf.Extensions.DacPac.csproj" />
+    <ProjectReference Include="..\..\src\Bdcf.Extensions.Data\Bdcf.Extensions.Data.csproj" />
   </ItemGroup>
 
   <ItemGroup>

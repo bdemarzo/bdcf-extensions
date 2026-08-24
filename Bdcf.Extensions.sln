@@ -1,4 +1,4 @@
-﻿
+
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 18
 VisualStudioVersion = 18.6.11822.322
@@ -32,6 +32,10 @@ EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Bdcf.Extensions.DacPac", "src\Bdcf.Extensions.DacPac\Bdcf.Extensions.DacPac.csproj", "{93E1176A-E528-4219-ACC7-869CB895AEE9}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Bdcf.Extensions.DacPac.Tests", "tests\Bdcf.Extensions.DacPac.Tests\Bdcf.Extensions.DacPac.Tests.csproj", "{AD76F2B7-2F4C-4F22-911B-9B67D0F4411E}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Bdcf.Extensions.Data", "src\Bdcf.Extensions.Data\Bdcf.Extensions.Data.csproj", "{6D4E8B9A-0E1C-4F52-9E5B-0C55A1D6B2F3}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Bdcf.Extensions.Data.Tests", "tests\Bdcf.Extensions.Data.Tests\Bdcf.Extensions.Data.Tests.csproj", "{A7F2C8D1-3B64-4E90-8A15-6C2D9B7E4F08}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Bdcf.Extensions.DacPac.IntegrationTests", "tests\Bdcf.Extensions.DacPac.IntegrationTests\Bdcf.Extensions.DacPac.IntegrationTests.csproj", "{7BCE1BD9-A8C7-4DD5-A292-5BB6DDA75E4F}"
 EndProject
@@ -78,6 +82,14 @@ Global
 		{7BCE1BD9-A8C7-4DD5-A292-5BB6DDA75E4F}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{7BCE1BD9-A8C7-4DD5-A292-5BB6DDA75E4F}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{7BCE1BD9-A8C7-4DD5-A292-5BB6DDA75E4F}.Release|Any CPU.Build.0 = Release|Any CPU
+		{6D4E8B9A-0E1C-4F52-9E5B-0C55A1D6B2F3}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{6D4E8B9A-0E1C-4F52-9E5B-0C55A1D6B2F3}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{6D4E8B9A-0E1C-4F52-9E5B-0C55A1D6B2F3}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{6D4E8B9A-0E1C-4F52-9E5B-0C55A1D6B2F3}.Release|Any CPU.Build.0 = Release|Any CPU
+		{A7F2C8D1-3B64-4E90-8A15-6C2D9B7E4F08}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{A7F2C8D1-3B64-4E90-8A15-6C2D9B7E4F08}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{A7F2C8D1-3B64-4E90-8A15-6C2D9B7E4F08}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{A7F2C8D1-3B64-4E90-8A15-6C2D9B7E4F08}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -87,6 +99,7 @@ Global
 		{EED6C6B2-BB78-4C57-83F8-58F6C4B7C237} = {02EA681E-C7D8-13C7-8484-4AC65E1B71E8}
 		{AD76F2B7-2F4C-4F22-911B-9B67D0F4411E} = {02EA681E-C7D8-13C7-8484-4AC65E1B71E8}
 		{7BCE1BD9-A8C7-4DD5-A292-5BB6DDA75E4F} = {02EA681E-C7D8-13C7-8484-4AC65E1B71E8}
+		{A7F2C8D1-3B64-4E90-8A15-6C2D9B7E4F08} = {02EA681E-C7D8-13C7-8484-4AC65E1B71E8}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {FCBDE8D6-68B4-4FF1-A44A-127A594F2520}

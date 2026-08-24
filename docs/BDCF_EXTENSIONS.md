@@ -169,7 +169,7 @@ dotnet add package Bdcf.Extensions
 
 ## Requirements
 
-- .NET 8 or newer
+- .NET 10 or newer
 
 ## See Also
 

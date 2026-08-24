@@ -297,8 +297,8 @@ dotnet add package Bdcf.Extensions.Web
 
 ## Requirements
 
-- .NET 8 or newer
-- ASP.NET Core 8.0 or newer
+- .NET 10 or newer
+- ASP.NET Core 10.0 or newer
 
 ## See Also
 
