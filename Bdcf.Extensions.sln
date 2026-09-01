@@ -1,4 +1,3 @@
-
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 18
 VisualStudioVersion = 18.6.11822.322
@@ -22,7 +21,6 @@ EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Config", "Config", "{2A64C51E-96C6-49E4-B92B-3FB2F4648487}"
 	ProjectSection(SolutionItems) = preProject
 		.editorconfig = .editorconfig
-		CHANGELOG.md = CHANGELOG.md
 		Directory.Build.props = Directory.Build.props
 		Directory.Packages.props = Directory.Packages.props
 		LICENSE = LICENSE
@@ -78,10 +76,6 @@ Global
 		{AD76F2B7-2F4C-4F22-911B-9B67D0F4411E}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{AD76F2B7-2F4C-4F22-911B-9B67D0F4411E}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{AD76F2B7-2F4C-4F22-911B-9B67D0F4411E}.Release|Any CPU.Build.0 = Release|Any CPU
-		{7BCE1BD9-A8C7-4DD5-A292-5BB6DDA75E4F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{7BCE1BD9-A8C7-4DD5-A292-5BB6DDA75E4F}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{7BCE1BD9-A8C7-4DD5-A292-5BB6DDA75E4F}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{7BCE1BD9-A8C7-4DD5-A292-5BB6DDA75E4F}.Release|Any CPU.Build.0 = Release|Any CPU
 		{6D4E8B9A-0E1C-4F52-9E5B-0C55A1D6B2F3}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{6D4E8B9A-0E1C-4F52-9E5B-0C55A1D6B2F3}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{6D4E8B9A-0E1C-4F52-9E5B-0C55A1D6B2F3}.Release|Any CPU.ActiveCfg = Release|Any CPU
@@ -90,6 +84,10 @@ Global
 		{A7F2C8D1-3B64-4E90-8A15-6C2D9B7E4F08}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{A7F2C8D1-3B64-4E90-8A15-6C2D9B7E4F08}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{A7F2C8D1-3B64-4E90-8A15-6C2D9B7E4F08}.Release|Any CPU.Build.0 = Release|Any CPU
+		{7BCE1BD9-A8C7-4DD5-A292-5BB6DDA75E4F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{7BCE1BD9-A8C7-4DD5-A292-5BB6DDA75E4F}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{7BCE1BD9-A8C7-4DD5-A292-5BB6DDA75E4F}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{7BCE1BD9-A8C7-4DD5-A292-5BB6DDA75E4F}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -98,8 +96,8 @@ Global
 		{3802C4B4-09D3-45BA-934E-C44FCEFCAA02} = {02EA681E-C7D8-13C7-8484-4AC65E1B71E8}
 		{EED6C6B2-BB78-4C57-83F8-58F6C4B7C237} = {02EA681E-C7D8-13C7-8484-4AC65E1B71E8}
 		{AD76F2B7-2F4C-4F22-911B-9B67D0F4411E} = {02EA681E-C7D8-13C7-8484-4AC65E1B71E8}
-		{7BCE1BD9-A8C7-4DD5-A292-5BB6DDA75E4F} = {02EA681E-C7D8-13C7-8484-4AC65E1B71E8}
 		{A7F2C8D1-3B64-4E90-8A15-6C2D9B7E4F08} = {02EA681E-C7D8-13C7-8484-4AC65E1B71E8}
+		{7BCE1BD9-A8C7-4DD5-A292-5BB6DDA75E4F} = {02EA681E-C7D8-13C7-8484-4AC65E1B71E8}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {FCBDE8D6-68B4-4FF1-A44A-127A594F2520}

@@ -8,6 +8,12 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <None Remove="C:\git\bdcf\bdcf-extensions\CHANGELOG.md" />
+    <None Remove="C:\git\bdcf\bdcf-extensions\docs\BDCF_EXTENSIONS.md" />
+    <None Remove="C:\git\bdcf\bdcf-extensions\docs\BDCF_EXTENSIONS_DACPAC.md" />
+    <None Remove="C:\git\bdcf\bdcf-extensions\docs\BDCF_EXTENSIONS_DATA.md" />
+    <None Remove="C:\git\bdcf\bdcf-extensions\docs\BDCF_EXTENSIONS_WEB.md" />
+    <None Remove="C:\git\bdcf\bdcf-extensions\README.md" />
     <None Remove="Test.dacpac" />
   </ItemGroup>
 
