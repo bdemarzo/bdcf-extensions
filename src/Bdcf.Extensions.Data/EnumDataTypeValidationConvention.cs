@@ -21,6 +21,8 @@ public sealed class EnumDataTypeValidationConvention(
 	/// <summary>
 	/// Applies enum validation to properties decorated with <see cref="EnumDataTypeAttribute"/>.
 	/// </summary>
+	/// <param name="modelBuilder">The convention model builder.</param>
+	/// <param name="context">The convention execution context.</param>
 	public void ProcessModelFinalizing(
 		IConventionModelBuilder modelBuilder,
 		IConventionContext<IConventionModelBuilder> context)

@@ -14,7 +14,7 @@ This project follows tag-based releases. Create releases from tags named `vMAJOR
   - increment `PATCH` for backward-compatible fixes
 - GitHub release notes may be generated from merged pull requests, but this changelog is the durable package-facing release history.
 
-## Unreleased
+## 1.0.0 - 2026-09-15
 
 - Added an opt-in EF Core convention that maps `AutoIncludeAttribute` navigations to model-level eager loading.
 - Added an opt-in EF Core convention that generates provider-aware enum check constraints from `EnumDataTypeAttribute`.
