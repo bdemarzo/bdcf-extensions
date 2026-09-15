@@ -4,8 +4,8 @@ Reusable .NET extension libraries used by BDCF applications.
 
 ## Framework Support
 
-- .NET 8 and newer
-- .NET Standard 2.0 is no longer supported
+- .NET 10 and newer
+- Earlier .NET and .NET Standard target frameworks are not supported
 
 ## Packages
 
@@ -35,6 +35,16 @@ SQL Server DACPAC deployment helpers:
 - configure deployment through options
 - apply a DACPAC at host startup
 
+### Bdcf.Extensions.Data
+
+Entity Framework Core 10 model-building conventions:
+
+- map `DefaultValueAttribute` values to relational column defaults
+- map `AutoIncludeAttribute` navigations to EF Core eager loading
+- generate provider-aware enum check constraints from `EnumDataTypeAttribute`
+- optionally validate enum values while preserving EF Core's numeric or string conversions
+- preserve explicit Fluent API configuration when it conflicts with an attribute
+
 ## Documentation
 
 Detailed documentation for each library is available in the [`/docs`](./docs/) folder:
@@ -42,6 +52,7 @@ Detailed documentation for each library is available in the [`/docs`](./docs/) f
 - [Bdcf.Extensions](./docs/BDCF_EXTENSIONS.md)
 - [Bdcf.Extensions.Web](./docs/BDCF_EXTENSIONS_WEB.md)
 - [Bdcf.Extensions.DacPac](./docs/BDCF_EXTENSIONS_DACPAC.md)
+- [Bdcf.Extensions.Data](./docs/BDCF_EXTENSIONS_DATA.md)
 
 ## Repository
 

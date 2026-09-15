@@ -1,15 +1,10 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
 	<PropertyGroup>
-		<TargetFramework>net8.0</TargetFramework>
+		<TargetFramework>net10.0</TargetFramework>
 		<Description>ASP.NET Core MVC, Razor, routing, HTTP, HTMX, TempData, and model-binding helpers for BDCF applications.</Description>
 		<PackageTags>bdcf;extensions;aspnetcore;mvc;razor;http;htmx;routing</PackageTags>
 	</PropertyGroup>
-
-	<ItemGroup>
-	  <None Remove="C:\git\bdcf\bdcf-extensions\CHANGELOG.md" />
-	  <None Remove="C:\git\bdcf\bdcf-extensions\README.md" />
-	</ItemGroup>
 
 	<ItemGroup>
 		<FrameworkReference Include="Microsoft.AspNetCore.App" />
