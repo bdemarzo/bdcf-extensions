@@ -40,6 +40,7 @@ SQL Server DACPAC deployment helpers:
 Entity Framework Core 10 model-building conventions:
 
 - map `DefaultValueAttribute` values to relational column defaults
+- map `AutoIncludeAttribute` navigations to EF Core eager loading
 - generate provider-aware enum check constraints from `EnumDataTypeAttribute`
 - optionally validate enum values while preserving EF Core's numeric or string conversions
 - preserve explicit Fluent API configuration when it conflicts with an attribute

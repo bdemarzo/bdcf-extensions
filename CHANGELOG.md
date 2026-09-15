@@ -16,6 +16,7 @@ This project follows tag-based releases. Create releases from tags named `vMAJOR
 
 ## Unreleased
 
+- Added an opt-in EF Core convention that maps `AutoIncludeAttribute` navigations to model-level eager loading.
 - Added an opt-in EF Core convention that generates provider-aware enum check constraints from `EnumDataTypeAttribute`.
 - Added a separate opt-in EF Core convention that validates `EnumDataTypeAttribute` enum values while preserving EF Core's numeric or string value converters.
 - Added opt-in kebab-case conventional MVC routing alongside the existing attribute-route token transformation. This is a backward-compatible minor-version feature.

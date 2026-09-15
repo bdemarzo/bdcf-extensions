@@ -2,8 +2,8 @@
 
 	<PropertyGroup>
 		<TargetFramework>net10.0</TargetFramework>
-		<Description>Entity Framework Core 10 conventions for relational defaults, enum check constraints, and enum value validation.</Description>
-		<PackageTags>bdcf;extensions;entityframeworkcore;efcore;defaultvalue;enum;validation;conventions</PackageTags>
+		<Description>Entity Framework Core 10 conventions for relational defaults, navigation auto-includes, enum check constraints, and enum value validation.</Description>
+		<PackageTags>bdcf;extensions;entityframeworkcore;efcore;defaultvalue;autoinclude;navigation;enum;validation;conventions</PackageTags>
 	</PropertyGroup>
 
 	<ItemGroup>

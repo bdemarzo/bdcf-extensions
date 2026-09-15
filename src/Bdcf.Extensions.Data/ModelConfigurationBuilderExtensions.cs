@@ -1,4 +1,5 @@
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Metadata.Conventions.Infrastructure;
 using Microsoft.EntityFrameworkCore.Storage;
 using Microsoft.Extensions.DependencyInjection;
 
@@ -9,6 +10,19 @@ namespace Bdcf.Extensions.Data;
 /// </summary>
 public static class ModelConfigurationBuilderExtensions
 {
+	/// <summary>
+	/// Registers the convention that automatically includes navigation properties marked with <see cref="DataAnnotations.AutoIncludeAttribute"/>.
+	/// </summary>
+	/// <param name="configurationBuilder">The model configuration builder.</param>
+	/// <returns>The same configuration builder.</returns>
+	public static ModelConfigurationBuilder AddAutoIncludeConvention(this ModelConfigurationBuilder configurationBuilder)
+	{
+		configurationBuilder.Conventions.Add(serviceProvider =>
+			new AutoIncludeConvention(serviceProvider.GetRequiredService<ProviderConventionSetBuilderDependencies>()));
+
+		return configurationBuilder;
+	}
+
 	/// <summary>
 	/// Registers the convention that maps <see cref="System.ComponentModel.DefaultValueAttribute"/>
 	/// values to relational column defaults.

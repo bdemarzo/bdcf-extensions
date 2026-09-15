@@ -37,6 +37,56 @@ public sealed class Order
 
 The convention is provider-agnostic but requires a relational EF Core provider because it configures relational column metadata, just like `Property(...).HasDefaultValue(...)`.
 
+## Auto-include navigations
+
+`AddAutoIncludeConvention()` registers a navigation convention that maps `AutoIncludeAttribute` on navigation properties to EF Core's AutoInclude configuration, enabling eager-loading of the decorated navigation by default.
+
+Register the convention in `DbContext.ConfigureConventions`:
+
+```csharp
+using Bdcf.Extensions.Data;
+using Microsoft.EntityFrameworkCore;
+
+public sealed class AppDbContext(DbContextOptions<AppDbContext> options) : DbContext(options)
+{
+	protected override void ConfigureConventions(ModelConfigurationBuilder configurationBuilder)
+	{
+		configurationBuilder.AddAutoIncludeConvention();
+	}
+}
+```
+
+Annotate navigation properties to opt them into automatic eager loading:
+
+```csharp
+using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations.Schema;
+using Bdcf.Extensions.Data.DataAnnotations;
+
+public sealed class Order
+{
+	public int Id { get; set; }
+
+	[ForeignKey(nameof(CustomerId))]
+	public Customer Customer { get; set; } = null!;
+	public int? CustomerId { get; set; }
+}
+
+public sealed class Customer
+{
+	public int Id { get; set; }
+
+	[AutoInclude]
+	public ICollection<Order> Orders { get; set; } = null!;
+}
+```
+
+Notes and behavior:
+- The convention applies to reference, collection, and skip navigations mapped by EF Core.
+- Explicit Fluent API configuration (for example, `navigationBuilder.AutoInclude()`) takes precedence over the attribute.
+- Use this convention to centralize simple eager-loading intent in code via attributes while preserving the option to override behavior via the Fluent API.
+- The convention is provider-agnostic because AutoInclude is an EF Core runtime behavior rather than a database-specific feature.
+
 ## Enum check constraints
 
 `AddEnumDataTypeCheckConstraintConvention()` registers an opt-in model-finalizing convention that maps `EnumDataTypeAttribute` on enum properties to relational check constraints. The attribute's `EnumType` must match the property's enum type, including the underlying type of nullable enums.
