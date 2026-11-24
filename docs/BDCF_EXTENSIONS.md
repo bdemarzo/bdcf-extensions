@@ -17,20 +17,22 @@ General-purpose helper methods for common .NET tasks.
 "Hi".Left(10)          // "Hi"
 ```
 
-**`TrimToNull()`** — Trim a nullable string and return `null` when the trimmed result is empty.
+**`TrimToNull(int? maxLength = null)`** — Trim a nullable string, optionally limit the result to `maxLength` characters, and return `null` when the trimmed result is empty. A specified `maxLength` must be at least 1.
 
 ```csharp
 "  Hello  ".TrimToNull()  // "Hello"
 "   ".TrimToNull()        // null
 ((string?)null).TrimToNull()  // null
+"  Hello World  ".TrimToNull(5)  // "Hello"
 ```
 
-**`TrimToEmpty()`** — Trim a nullable string and return an empty string when the value is `null`.
+**`TrimToEmpty(int? maxLength = null)`** — Trim a nullable string, optionally limit the result to `maxLength` characters, and return an empty string when the value is `null`. A specified `maxLength` must be at least 1.
 
 ```csharp
 "  Hello  ".TrimToEmpty()  // "Hello"
 "   ".TrimToEmpty()        // ""
 ((string?)null).TrimToEmpty()  // ""
+"  Hello World  ".TrimToEmpty(5)  // "Hello"
 ```
 
 ### Enum Extensions
@@ -130,9 +132,11 @@ Helpers for reading and updating claims on a `ClaimsPrincipal`.
 **`GetClaim<T>(string claimType)`** — Get the first matching claim value and convert it to the requested type. Returns the default value when the claim is missing or cannot be converted.
 
 ```csharp
-int? userId = User.GetClaim<int>("user_id");
+int? userId = User.GetClaim<int?>("user_id");  // null if missing or invalid
 string? email = User.GetClaim(ClaimTypes.Email);
 ```
+
+For a non-nullable value type, the default is its zero-initialized value; for example, `GetClaim<int>` returns `0` when the claim is missing or invalid.
 
 **`GetRequiredClaim<T>(string claimType)`** — Get the first matching claim value and convert it to the requested type. Throws `SecurityException` when the claim is missing or cannot be converted.
 

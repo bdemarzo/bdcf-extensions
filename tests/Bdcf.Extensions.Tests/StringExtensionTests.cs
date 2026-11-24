@@ -1,4 +1,4 @@
-﻿namespace Bdcf.Extensions.Tests;
+namespace Bdcf.Extensions.Tests;
 
 public class StringExtensionTests
 {
@@ -41,6 +41,28 @@ public class StringExtensionTests
 	}
 
 	[Theory]
+	[InlineData("  Hello World  ", 5, "Hello")]
+	[InlineData("  Hi  ", 10, "Hi")]
+	[InlineData(null, 5, null)]
+	[InlineData("   ", 5, null)]
+	public void TrimToNullReturnsExpectedValueWithMaxLength(string? value, int maxLength, string? expected)
+	{
+		Assert.Equal(expected, value.TrimToNull(maxLength));
+	}
+
+	[Theory]
+	[InlineData(null, 0)]
+	[InlineData(null, -1)]
+	[InlineData("", 0)]
+	[InlineData("", -1)]
+	[InlineData("value", 0)]
+	[InlineData("value", -1)]
+	public void TrimToNullThrowsArgumentOutOfRangeExceptionForInvalidMaxLength(string? value, int maxLength)
+	{
+		Assert.Throws<ArgumentOutOfRangeException>(() => value.TrimToNull(maxLength));
+	}
+
+	[Theory]
 	[InlineData(null, "")]
 	[InlineData("", "")]
 	[InlineData("   ", "")]
@@ -50,5 +72,25 @@ public class StringExtensionTests
 	public void TrimToEmptyReturnsExpectedValue(string? value, string expected)
 	{
 		Assert.Equal(expected, value.TrimToEmpty());
+	}
+
+	[Theory]
+	[InlineData("  Hello World  ", 5, "Hello")]
+	[InlineData("  Hi  ", 10, "Hi")]
+	[InlineData(null, 5, "")]
+	[InlineData("   ", 5, "")]
+	public void TrimToEmptyReturnsExpectedValueWithMaxLength(string? value, int maxLength, string expected)
+	{
+		Assert.Equal(expected, value.TrimToEmpty(maxLength));
+	}
+
+	[Theory]
+	[InlineData(null, 0)]
+	[InlineData(null, -1)]
+	[InlineData("value", 0)]
+	[InlineData("value", -1)]
+	public void TrimToEmptyThrowsArgumentOutOfRangeExceptionForInvalidMaxLength(string? value, int maxLength)
+	{
+		Assert.Throws<ArgumentOutOfRangeException>(() => value.TrimToEmpty(maxLength));
 	}
 }

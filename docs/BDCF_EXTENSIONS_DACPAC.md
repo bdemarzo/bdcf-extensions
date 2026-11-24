@@ -1,200 +1,97 @@
 # Bdcf.Extensions.DacPac
 
-SQL Server DACPAC deployment helpers for automated schema migrations at application startup or runtime.
+Deploy an embedded SQL Server DACPAC from a .NET host using DacFx.
 
-## Overview
+## Setup
 
-`Bdcf.Extensions.DacPac` simplifies deploying embedded DACPAC files to SQL Server databases. It integrates with dependency injection and can run automatically during application startup or be invoked manually.
+Embed the DACPAC in an assembly and set `DacPacName` to its **exact manifest resource name**, which may include the assembly's root namespace and folders. For example, set an explicit name in the project containing the file:
 
-## Key Features
-
-### DacPacService
-
-Core service for deploying DACPAC files to a database.
-
-```csharp
-// Register in Program.cs
-services.Configure<DacPacOptions>(options =>
-{
-	options.ConnectionString = "Server=localhost;Database=MyDb;...";
-	options.DacPacName = "database.dacpac";
-	options.DacPacResourceMarkerType = typeof(Program);  // Assembly containing the DACPAC
-});
-
-services.AddScoped<IDacPacService, DacPacService>();
+```xml
+<EmbeddedResource Include="schema.dacpac" LogicalName="schema.dacpac" />
 ```
 
-### Automatic Startup Deployment
-
-**`ApplyDacPacHostedService`** — Deploy DACPAC automatically when the application starts.
+Register the service and options in the host. The options have init-only properties, so construct an options instance rather than assigning properties inside a `Configure` callback.
 
 ```csharp
-services.Configure<DacPacOptions>(options =>
-{
-	options.ConnectionString = builder.Configuration.GetConnectionString("DefaultConnection");
-	options.DacPacName = "schema.dacpac";
-	options.DacPacResourceMarkerType = typeof(Program);
-});
+using Bdcf.Extensions.DacPac;
+using Microsoft.Extensions.Options;
 
-services.AddDacPacDeployment();  // Adds hosted service
+var builder = WebApplication.CreateBuilder(args);
+
+builder.Services.AddSingleton<IOptions<DacPacOptions>>(Options.Create(new DacPacOptions
+{
+    ConnectionStringName = "DefaultConnection",
+    DacPacName = "schema.dacpac",
+    DacPacResourceMarkerType = typeof(Program)
+}));
+builder.Services.AddDacPacService();
+builder.AddDacPacApplyOnStartup(failOnError: true);
+
+var app = builder.Build();
+app.Run();
 ```
 
-The service will automatically:
-1. Load the embedded DACPAC resource
-2. Connect to the database using the connection string
-3. Deploy the schema
-4. Log the operation
+The hosted service applies the DACPAC during host startup. By default it logs deployment errors and allows startup to continue; `failOnError: true` propagates the error. Registering `AddDacPacApplyOnStartup` does not itself register `IDacPacService`.
 
-### Configuration Options
+Alternatively, omit the hosted service and call `app.ApplyDacPac(failOnError: true)` after building the host and before running it. This method does nothing when `IDacPacService` is not registered; it logs deployment errors and continues unless `failOnError` is true.
 
-**`DacPacOptions`** — Configure deployment behavior.
+## Configuration
 
-```csharp
-public record DacPacOptions
-{
-	/// Connection string to the target database
-	public string ConnectionString { get; init; }
+`ConnectionStringName` looks first in the host's `ConnectionStrings` configuration section, then in `ConfigurationManager.ConnectionStrings`. If no nonempty named value is found, `ConnectionString` is used. The connection string must contain `Database` or `Initial Catalog`.
 
-	/// Connection string name from configuration (takes precedence)
-	public string ConnectionStringName { get; init; }
-
-	/// Name of the embedded DACPAC file
-	public required string DacPacName { get; init; }
-
-	/// Assembly containing the DACPAC (set via code or by type marker)
-	public Assembly? DacPacAssembly { get; init; }
-	public Type? DacPacResourceMarkerType { get; init; }
-
-	/// Optional deployment options (compare options, scripts, etc.)
-	public DacDeployOptions? DeployOptions { get; init; }
-}
-```
-
-### Manual Deployment
-
-Inject and use the service directly:
-
-```csharp
-public class DatabaseMigrationController
-{
-	private readonly IDacPacService _dacService;
-
-	public DatabaseMigrationController(IDacPacService dacService)
-	{
-		_dacService = dacService;
-	}
-
-	[HttpPost]
-	public async Task<IActionResult> DeploySchema()
-	{
-		try
-		{
-			await _dacService.DeployAsync();
-			return Ok("Schema deployed successfully");
-		}
-		catch (Exception ex)
-		{
-			return BadRequest($"Deployment failed: {ex.Message}");
-		}
-	}
-}
-```
-
-### Configuration from appsettings.json
+Specify the resource assembly using `DacPacAssembly`, `DacPacResourceMarkerType`, or `AssemblyName`, in that order of precedence. `AssemblyName` is suitable for configuration binding:
 
 ```json
 {
+  "ConnectionStrings": {
+    "DefaultConnection": "Server=localhost;Database=MyDb;Integrated Security=true;TrustServerCertificate=true"
+  },
   "DacPac": {
-	"ConnectionStringName": "DefaultConnection",
-	"DacPacName": "schema.dacpac"
+    "ConnectionStringName": "DefaultConnection",
+    "AssemblyName": "MyApplication",
+    "DacPacName": "schema.dacpac"
   }
 }
 ```
 
-Then configure in Program.cs:
-
 ```csharp
-services.Configure<DacPacOptions>(configuration.GetSection("DacPac"));
+builder.Services.Configure<DacPacOptions>(builder.Configuration.GetSection("DacPac"));
+builder.Services.AddDacPacService();
 ```
 
-## Setup Steps
+The deployment options exposed on `DacPacOptions` are:
 
-1. **Embed DACPAC in Project** — Add your DACPAC file as an embedded resource in your assembly.
+| Property | Default |
+| --- | --- |
+| `BlockOnPossibleDataLoss` | `true` |
+| `GenerateSmartDefaults` | `false` |
+| `LongRunningCommandTimeout` | `0` (no timeout) |
+| `DropObjectsNotInSource` | `false` |
+| `VerifyDeployment` | `true` |
 
-2. **Configure Options**:
-   ```csharp
-   services.Configure<DacPacOptions>(options =>
-   {
-	   options.ConnectionString = "your-connection-string";
-	   options.DacPacName = "database.dacpac";
-	   options.DacPacResourceMarkerType = typeof(Program);
-   });
-   ```
+## Manual deployment
 
-3. **Register Service**:
-   ```csharp
-   services.AddDacPacDeployment();  // For automatic startup
-   // OR
-   services.AddScoped<IDacPacService, DacPacService>();  // For manual use
-   ```
-
-4. **Deploy**:
-   - Automatic: Application starts and deploys
-   - Manual: Inject `IDacPacService` and call `DeployAsync()`
-
-## Common Scenarios
-
-### Scenario: Deploy on Application Startup
+Inject `IDacPacService` and call `ApplyDacPac()` or `ApplyDacPacAsync()`:
 
 ```csharp
-var builder = WebApplication.CreateBuilder(args);
-
-builder.Services.Configure<DacPacOptions>(options =>
+app.MapPost("/admin/deploy-schema", async (IDacPacService service, CancellationToken cancellationToken) =>
 {
-	options.ConnectionStringName = "DefaultConnection";
-	options.DacPacName = "schema.dacpac";
-	options.DacPacResourceMarkerType = typeof(Program);
-});
-
-builder.Services.AddDacPacDeployment();
-
-var app = builder.Build();
-// DACPAC is deployed during app startup before the first request
-app.Run();
-```
-
-### Scenario: Deploy on Admin Command
-
-```csharp
-app.MapPost("/admin/deploy-schema", async (IDacPacService service) =>
-{
-	try
-	{
-		await service.DeployAsync();
-		return Results.Ok("Deployed");
-	}
-	catch (Exception ex)
-	{
-		return Results.BadRequest(ex.Message);
-	}
+    await service.ApplyDacPacAsync(cancellationToken);
+    return Results.Ok("Deployed");
 });
 ```
 
-## Installation
+The underlying DacFx deployment is synchronous. The async method schedules that work on the thread pool and honors cancellation before it starts; it does not cancel an ongoing deployment.
 
-Install via NuGet:
+## Installation and requirements
 
-```
+```text
 dotnet add package Bdcf.Extensions.DacPac
 ```
 
-## Requirements
+Requires .NET 10 or newer, a SQL Server database, and an embedded DACPAC.
 
-- .NET 10 or newer
-- SQL Server (local or remote)
-- DACPAC file embedded in your assembly
+## See also
 
-## See Also
-
-- [Bdcf.Extensions](./BDCF_EXTENSIONS.md) — General-purpose .NET helpers
+- [Bdcf.Extensions](./BDCF_EXTENSIONS.md) — general-purpose .NET helpers
 - [Bdcf.Extensions.Web](./BDCF_EXTENSIONS_WEB.md) — ASP.NET Core helpers

@@ -146,12 +146,12 @@ Enable the tag helpers in `_ViewImports.cshtml`:
 
 ```html
 <!-- Include element only if condition is true -->
-<div include-if="@User.IsInRole(\"Admin\")">
+<div include-if="@User.IsInRole("Admin")">
 	Admin Panel
 </div>
 
 <!-- Exclude element if condition is true -->
-<nav exclude-if="@User.Identity?.IsAuthenticated ?? false">
+<nav exclude-if="@(User.Identity?.IsAuthenticated ?? false)">
 	Login / Sign Up
 </nav>
 ```
