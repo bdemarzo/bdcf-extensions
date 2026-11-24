@@ -42,6 +42,8 @@ public class StringExtensionTests
 
 	[Theory]
 	[InlineData("  Hello World  ", 5, "Hello")]
+	[InlineData("1234 6", 5, "1234")]
+	[InlineData("  12\t 34  ", 4, "12")]
 	[InlineData("  Hi  ", 10, "Hi")]
 	[InlineData(null, 5, null)]
 	[InlineData("   ", 5, null)]
@@ -76,6 +78,8 @@ public class StringExtensionTests
 
 	[Theory]
 	[InlineData("  Hello World  ", 5, "Hello")]
+	[InlineData("1234 6", 5, "1234")]
+	[InlineData("  12\t 34  ", 4, "12")]
 	[InlineData("  Hi  ", 10, "Hi")]
 	[InlineData(null, 5, "")]
 	[InlineData("   ", 5, "")]

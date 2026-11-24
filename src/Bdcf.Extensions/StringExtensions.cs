@@ -45,7 +45,7 @@ public static class StringExtensions
 			return null;
 		}
 
-		return maxLength is int length && trimmed.Length > length ? trimmed[..length] : trimmed;
+		return maxLength is int length && trimmed.Length > length ? trimmed[..length].TrimEnd() : trimmed;
 	}
 
 	/// <summary>
@@ -64,6 +64,6 @@ public static class StringExtensions
 
 		string trimmed = value?.Trim() ?? string.Empty;
 
-		return maxLength is int length && trimmed.Length > length ? trimmed[..length] : trimmed;
+		return maxLength is int length && trimmed.Length > length ? trimmed[..length].TrimEnd() : trimmed;
 	}
 }
