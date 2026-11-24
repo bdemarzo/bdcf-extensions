@@ -25,24 +25,45 @@ public static class StringExtensions
 	}
 
 	/// <summary>
-	/// Trims the string and returns <see langword="null"/> when the result is empty.
+	/// Trims the string, optionally limits its length, and returns <see langword="null"/> when the result is empty.
 	/// </summary>
 	/// <param name="value">The string to trim.</param>
-	/// <returns>The trimmed string, or <see langword="null"/> if the value is null, empty, or whitespace.</returns>
-	public static string? TrimToNull(this string? value)
+	/// <param name="maxLength">The maximum length of the trimmed string. Must be at least 1 when specified.</param>
+	/// <returns>The trimmed string, limited to <paramref name="maxLength"/> characters when specified, or <see langword="null"/> if the value is null, empty, or whitespace.</returns>
+	/// <exception cref="ArgumentOutOfRangeException"><paramref name="maxLength"/> is less than 1.</exception>
+	public static string? TrimToNull(this string? value, int? maxLength = null)
 	{
+		if (maxLength is < 1)
+		{
+			throw new ArgumentOutOfRangeException(nameof(maxLength));
+		}
+
 		string? trimmed = value?.Trim();
 
-		return trimmed?.Length > 0 ? trimmed : null;
+		if (trimmed is null || trimmed.Length == 0)
+		{
+			return null;
+		}
+
+		return maxLength is int length && trimmed.Length > length ? trimmed[..length] : trimmed;
 	}
 
 	/// <summary>
-	/// Trims the string and returns <see cref="string.Empty"/> when the value is null.
+	/// Trims the string, optionally limits its length, and returns <see cref="string.Empty"/> when the value is null.
 	/// </summary>
 	/// <param name="value">The string to trim.</param>
-	/// <returns>The trimmed string, or <see cref="string.Empty"/> if the value is null.</returns>
-	public static string TrimToEmpty(this string? value)
+	/// <param name="maxLength">The maximum length of the trimmed string. Must be at least 1 when specified.</param>
+	/// <returns>The trimmed string, limited to <paramref name="maxLength"/> characters when specified, or <see cref="string.Empty"/> if the value is null.</returns>
+	/// <exception cref="ArgumentOutOfRangeException"><paramref name="maxLength"/> is less than 1.</exception>
+	public static string TrimToEmpty(this string? value, int? maxLength = null)
 	{
-		return value?.Trim() ?? string.Empty;
+		if (maxLength is < 1)
+		{
+			throw new ArgumentOutOfRangeException(nameof(maxLength));
+		}
+
+		string trimmed = value?.Trim() ?? string.Empty;
+
+		return maxLength is int length && trimmed.Length > length ? trimmed[..length] : trimmed;
 	}
 }

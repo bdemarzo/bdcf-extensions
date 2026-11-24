@@ -17,20 +17,22 @@ General-purpose helper methods for common .NET tasks.
 "Hi".Left(10)          // "Hi"
 ```
 
-**`TrimToNull()`** — Trim a nullable string and return `null` when the trimmed result is empty.
+**`TrimToNull(int? maxLength = null)`** — Trim a nullable string, optionally limit the result to `maxLength` characters, and return `null` when the trimmed result is empty. A specified `maxLength` must be at least 1.
 
 ```csharp
 "  Hello  ".TrimToNull()  // "Hello"
 "   ".TrimToNull()        // null
 ((string?)null).TrimToNull()  // null
+"  Hello World  ".TrimToNull(5)  // "Hello"
 ```
 
-**`TrimToEmpty()`** — Trim a nullable string and return an empty string when the value is `null`.
+**`TrimToEmpty(int? maxLength = null)`** — Trim a nullable string, optionally limit the result to `maxLength` characters, and return an empty string when the value is `null`. A specified `maxLength` must be at least 1.
 
 ```csharp
 "  Hello  ".TrimToEmpty()  // "Hello"
 "   ".TrimToEmpty()        // ""
 ((string?)null).TrimToEmpty()  // ""
+"  Hello World  ".TrimToEmpty(5)  // "Hello"
 ```
 
 ### Enum Extensions
