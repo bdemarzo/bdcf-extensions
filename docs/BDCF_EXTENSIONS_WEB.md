@@ -12,6 +12,7 @@ ASP.NET Core enhancements and extensions for MVC/Razor applications, with first-
   - [Action Results](#action-results)
   - [Tag Helpers](#tag-helpers)
   - [Model Binding](#model-binding)
+  - [Model State](#model-state)
   - [TempData Extensions](#tempdata-extensions)
   - [Route Transformation](#route-transformation)
   - [Legacy HTML Helper Extensions](#legacy-html-helper-extensions)
@@ -204,6 +205,14 @@ public IActionResult Process(TimeSpan duration)
 {
 	// duration = 1 hour, 30 minutes
 }
+```
+
+### Model State
+
+**`AddModelErrors(string key, string[] errors)`** — Add multiple validation errors to one model state entry.
+
+```csharp
+ModelState.AddModelErrors("Email", errors);
 ```
 
 ### TempData Extensions
